@@ -50,3 +50,15 @@ bool polysIntersect(List<Offset> p1, List<Offset> p2) {
 double hypot(double x, double y) {
   return math.sqrt(math.pow(x, 2) + math.pow(y, 2));
 }
+
+extension RGBA on double {
+  Color toRGBA() {
+    double value = this;
+    double opacity = value.abs();
+    int r = value < 0 ? 0 : 255;
+    int g = r;
+    int b = value > 0 ? 0 : 255;
+
+    return Color.fromRGBO(r, g, b, opacity);
+  }
+}

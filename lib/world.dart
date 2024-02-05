@@ -5,6 +5,7 @@ import 'models/car.dart';
 import 'models/controls.dart';
 import 'models/road.dart';
 import 'models/sensor.dart';
+import 'visualizer.dart';
 
 class World extends StatefulWidget {
   const World({super.key});
@@ -74,6 +75,14 @@ class _WorldState extends State<World> with SingleTickerProviderStateMixin {
             road: road,
             car: car,
             traffic: traffic,
+          ),
+        ),
+        Positioned(
+          top: 16,
+          right: 16,
+          child: CustomPaint(
+            size: const Size(250, 250),
+            painter: VisualiserPainter(network: car.brain),
           ),
         ),
       ],

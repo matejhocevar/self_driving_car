@@ -100,7 +100,6 @@ class Car extends CustomPainter {
         controls.right = outputs[2] > 0;
         controls.reverse = outputs[3] > 0;
       }
-      print(outputs);
     }
   }
 

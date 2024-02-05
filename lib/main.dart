@@ -18,9 +18,7 @@ class MainApp extends StatelessWidget {
       showPerformanceOverlay: false,
       home: Container(
         color: Colors.grey,
-        child: const Center(
-          child: World(),
-        ),
+        child: const World(),
       ),
     );
   }
