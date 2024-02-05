@@ -1,9 +1,11 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:self_driving_car/network.dart';
 
 import '../utils/math.dart';
 import 'controls.dart';
+import 'math.dart';
 import 'sensor.dart';
 
 class Car extends CustomPainter {
@@ -18,6 +20,8 @@ class Car extends CustomPainter {
     this.angle = 0,
     this.color = Colors.blue,
   }) {
+    useBrain = controlType == ControlType.AI;
+
     if (controlType != ControlType.dummy) {
       sensor = Sensor(
         car: this,
@@ -25,6 +29,7 @@ class Car extends CustomPainter {
         rayLength: 150,
         raySpread: math.pi / 2,
       );
+      brain = NeuralNetwork(neuronCounts: [sensor.rayCount, 6, 4]);
     }
 
     polygon = _createPolygon();
@@ -48,6 +53,8 @@ class Car extends CustomPainter {
   late Sensor sensor;
   late Controls controls;
   final ControlType controlType;
+  late NeuralNetwork brain;
+  bool useBrain = false;
 
   late List<Offset> polygon;
 
@@ -82,6 +89,18 @@ class Car extends CustomPainter {
 
     if (controlType != ControlType.dummy) {
       sensor.update(roadBorders, traffic);
+      List<double> offsets = sensor.readings
+          .map((Position? p) => p?.offset == null ? 0.0 : 1 - p!.offset)
+          .toList();
+      List<double> outputs = NeuralNetwork.feedForward(offsets, brain);
+
+      if (useBrain) {
+        controls.forward = outputs[0] > 0;
+        controls.left = outputs[1] > 0;
+        controls.right = outputs[2] > 0;
+        controls.reverse = outputs[3] > 0;
+      }
+      print(outputs);
     }
   }
 

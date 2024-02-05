@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
 
-enum ControlType { unknown, keys, dummy }
+enum ControlType { unknown, keys, dummy, AI }
 
 class Controls {
   Controls({

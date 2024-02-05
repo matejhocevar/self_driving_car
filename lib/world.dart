@@ -33,7 +33,7 @@ class _WorldState extends State<World> with SingleTickerProviderStateMixin {
       y: 100,
       width: 30,
       height: 50,
-      controlType: ControlType.keys,
+      controlType: ControlType.AI,
     );
     traffic.addAll([
       Car(

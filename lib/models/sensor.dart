@@ -20,7 +20,7 @@ class Sensor extends CustomPainter {
   final double raySpread;
 
   List<List<Offset>> rays = [];
-  List readings = [];
+  List<Position?> readings = [];
 
   void update(List<List<Offset>> roadBorders, List<Car> traffic) {
     _castRays();
