@@ -17,6 +17,7 @@ class _WorldState extends State<World> with SingleTickerProviderStateMixin {
   late Car car;
   late Road road;
   late Sensor sensor;
+  List<Car> traffic = [];
 
   late AnimationController _controller;
 
@@ -32,8 +33,19 @@ class _WorldState extends State<World> with SingleTickerProviderStateMixin {
       y: 100,
       width: 30,
       height: 50,
-      controls: Controls(),
+      controlType: ControlType.keys,
     );
+    traffic.addAll([
+      Car(
+        x: road.getLaneCenter(1),
+        y: -100,
+        width: 30,
+        height: 50,
+        maxSpeed: 2,
+        controlType: ControlType.dummy,
+        color: Colors.purpleAccent,
+      ),
+    ]);
 
     RawKeyboard.instance.addListener(car.controls.onKeyEvent);
 
@@ -42,7 +54,8 @@ class _WorldState extends State<World> with SingleTickerProviderStateMixin {
       duration: const Duration(milliseconds: 16),
     )..addListener(() {
         setState(() {
-          car.update(road.borders);
+          car.update(road.borders, traffic);
+          traffic.forEach((Car c) => c.update(road.borders, []));
         });
       });
 
@@ -58,8 +71,9 @@ class _WorldState extends State<World> with SingleTickerProviderStateMixin {
         CustomPaint(
           size: size,
           painter: WorldPainter(
-            roadPainter: road,
-            carPainter: car,
+            road: road,
+            car: car,
+            traffic: traffic,
           ),
         ),
       ],
@@ -76,21 +90,27 @@ class _WorldState extends State<World> with SingleTickerProviderStateMixin {
 
 class WorldPainter extends CustomPainter {
   const WorldPainter({
-    required this.roadPainter,
-    required this.carPainter,
+    required this.road,
+    required this.car,
+    required this.traffic,
   });
 
-  final Road roadPainter;
-  final Car carPainter;
+  final Road road;
+  final Car car;
+  final List<Car> traffic;
 
   @override
   void paint(Canvas canvas, Size size) {
     canvas.save();
 
-    canvas.translate(0, -carPainter.y + size.height * 0.7);
+    canvas.translate(0, -car.y + size.height * 0.7);
+    road.paint(canvas, size);
 
-    roadPainter.paint(canvas, size);
-    carPainter.paint(canvas, size);
+    for (int i = 0; i < traffic.length; i++) {
+      traffic[i].paint(canvas, size);
+    }
+
+    car.paint(canvas, size);
 
     canvas.restore();
   }

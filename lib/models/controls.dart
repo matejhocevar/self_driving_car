@@ -1,13 +1,27 @@
 import 'package:flutter/services.dart';
 
+enum ControlType { unknown, keys, dummy }
+
 class Controls {
   Controls({
+    this.type = ControlType.dummy,
     this.forward = false,
     this.left = false,
     this.right = false,
     this.reverse = false,
-  });
+  }) {
+    switch (type) {
+      case ControlType.dummy:
+        {
+          forward = true;
+          break;
+        }
+      default:
+        break;
+    }
+  }
 
+  ControlType type;
   bool forward;
   bool left;
   bool right;

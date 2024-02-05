@@ -12,16 +12,23 @@ class Car extends CustomPainter {
     required this.y,
     required this.width,
     required this.height,
-    required this.controls,
+    this.maxSpeed = 3,
+    this.controlType = ControlType.dummy,
     this.speed = 0,
     this.angle = 0,
+    this.color = Colors.blue,
   }) {
-    sensor = Sensor(
-      car: this,
-      rayCount: 5,
-      rayLength: 150,
-      raySpread: math.pi / 2,
-    );
+    if (controlType != ControlType.dummy) {
+      sensor = Sensor(
+        car: this,
+        rayCount: 5,
+        rayLength: 150,
+        raySpread: math.pi / 2,
+      );
+    }
+
+    polygon = _createPolygon();
+    controls = Controls(type: controlType);
   }
 
   double x;
@@ -30,15 +37,17 @@ class Car extends CustomPainter {
   double height;
   double speed;
   double angle;
+  double maxSpeed;
+  Color color;
 
   static const double friction = 0.05;
   static const double acceleration = 0.2;
-  static const double maxSpeed = 3;
   static const double steerAngle = 0.03;
   bool damaged = false;
 
   late Sensor sensor;
-  Controls controls;
+  late Controls controls;
+  final ControlType controlType;
 
   late List<Offset> polygon;
 
@@ -49,26 +58,31 @@ class Car extends CustomPainter {
     double? height,
     double? speed,
     double? angle,
-    Controls? controls,
+    ControlType? controlType,
+    Color? color,
   }) {
     return Car(
       x: x ?? this.x,
       y: y ?? this.y,
       width: width ?? this.width,
       height: height ?? this.height,
-      controls: controls ?? this.controls,
+      controlType: controlType ?? this.controlType,
       speed: speed ?? this.speed,
       angle: angle ?? this.angle,
+      color: color ?? this.color,
     );
   }
 
-  void update(List<List<Offset>> roadBorders) {
+  void update(List<List<Offset>> roadBorders, List<Car> traffic) {
     if (!damaged) {
       _move();
       polygon = _createPolygon();
-      damaged = _assessDamage(roadBorders);
+      damaged = _assessDamage(roadBorders, traffic);
     }
-    sensor.update(roadBorders);
+
+    if (controlType != ControlType.dummy) {
+      sensor.update(roadBorders, traffic);
+    }
   }
 
   List<Offset> _createPolygon() {
@@ -102,12 +116,12 @@ class Car extends CustomPainter {
       speed -= Car.acceleration;
     }
 
-    if (speed > Car.maxSpeed) {
-      speed = Car.maxSpeed;
+    if (speed > maxSpeed) {
+      speed = maxSpeed;
     }
 
-    if (speed < -Car.maxSpeed / 2) {
-      speed = -Car.maxSpeed / 2;
+    if (speed < -maxSpeed / 2) {
+      speed = -maxSpeed / 2;
     }
 
     if (speed > 0) {
@@ -134,9 +148,15 @@ class Car extends CustomPainter {
     y -= math.cos(angle) * speed;
   }
 
-  bool _assessDamage(List<List<Offset>> roadBorders) {
+  bool _assessDamage(List<List<Offset>> roadBorders, List<Car> traffic) {
     for (int i = 0; i < roadBorders.length; i++) {
       if (polysIntersect(polygon, roadBorders[i])) {
+        return true;
+      }
+    }
+
+    for (int i = 0; i < traffic.length; i++) {
+      if (polysIntersect(polygon, traffic[i].polygon)) {
         return true;
       }
     }
@@ -147,7 +167,7 @@ class Car extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     var carPaint = Paint()
-      ..color = damaged ? Colors.redAccent : Colors.black
+      ..color = damaged ? Colors.redAccent : color
       ..style = PaintingStyle.fill;
 
     Path path = Path();
@@ -158,7 +178,9 @@ class Car extends CustomPainter {
 
     canvas.drawPath(path, carPaint);
 
-    sensor.paint(canvas, size);
+    if (controlType != ControlType.dummy) {
+      sensor.paint(canvas, size);
+    }
   }
 
   @override

@@ -22,13 +22,13 @@ class Sensor extends CustomPainter {
   List<List<Offset>> rays = [];
   List readings = [];
 
-  void update(List<List<Offset>> roadBorders) {
+  void update(List<List<Offset>> roadBorders, List<Car> traffic) {
     _castRays();
 
     readings = [];
     for (int i = 0; i < rays.length; i++) {
       readings.add(
-        _getReading(rays[i], roadBorders),
+        _getReading(rays[i], roadBorders, traffic),
       );
     }
   }
@@ -52,7 +52,8 @@ class Sensor extends CustomPainter {
     }
   }
 
-  Position? _getReading(List<Offset> ray, List<List<Offset>> roadBorders) {
+  Position? _getReading(
+      List<Offset> ray, List<List<Offset>> roadBorders, List<Car> traffic) {
     final [rayStart, rayEnd] = ray;
 
     List<Position> touches = [];
@@ -67,6 +68,22 @@ class Sensor extends CustomPainter {
 
       if (touch != null) {
         touches.add(touch);
+      }
+    }
+
+    for (int i = 0; i < traffic.length; i++) {
+      var poly = traffic[i].polygon;
+      for (int j = 0; j < poly.length; j++) {
+        Position? touch = getIntersection(
+          rayStart,
+          rayEnd,
+          poly[j],
+          poly[(j + 1) % poly.length],
+        );
+
+        if (touch != null) {
+          touches.add(touch);
+        }
       }
     }
 
