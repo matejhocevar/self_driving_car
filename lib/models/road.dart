@@ -2,7 +2,10 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-class Road {
+import '../utils/canvas.dart';
+import '../utils/math.dart';
+
+class Road extends CustomPainter {
   Road({
     required this.x,
     required this.width,
@@ -46,6 +49,38 @@ class Road {
     return left +
         laneWidth / 2 +
         math.min(laneIndex, laneCount - 1) * laneWidth;
+  }
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    Paint roadPaint = Paint()
+      ..color = Colors.white
+      ..strokeWidth = 5;
+
+    for (int i = 1; i <= laneCount - 1; i++) {
+      double x = lerp(left, right, i / laneCount);
+
+      var topOffset = Offset(x, top);
+      var bottomOffset = Offset(x, bottom);
+
+      drawDashedLine(
+        canvas,
+        topOffset,
+        bottomOffset,
+        roadPaint,
+        dashWidth: 20,
+        dashSpace: 20,
+      );
+    }
+
+    borders.forEach((List<Offset> border) {
+      canvas.drawLine(border[0], border[1], roadPaint);
+    });
+  }
+
+  @override
+  bool shouldRepaint(covariant Road oldDelegate) {
+    return oldDelegate != this;
   }
 
   @override

@@ -5,9 +5,6 @@ import 'models/car.dart';
 import 'models/controls.dart';
 import 'models/road.dart';
 import 'models/sensor.dart';
-import 'painters/car_painter.dart';
-import 'painters/road_painter.dart';
-import 'painters/world_painter.dart';
 
 class World extends StatefulWidget {
   const World({super.key});
@@ -61,8 +58,8 @@ class _WorldState extends State<World> with SingleTickerProviderStateMixin {
         CustomPaint(
           size: size,
           painter: WorldPainter(
-            roadPainter: RoadPainter(road: road),
-            carPainter: CarPainter(car: car),
+            roadPainter: road,
+            carPainter: car,
           ),
         ),
       ],
@@ -75,4 +72,29 @@ class _WorldState extends State<World> with SingleTickerProviderStateMixin {
     RawKeyboard.instance.removeListener(car.controls.onKeyEvent);
     super.dispose();
   }
+}
+
+class WorldPainter extends CustomPainter {
+  const WorldPainter({
+    required this.roadPainter,
+    required this.carPainter,
+  });
+
+  final Road roadPainter;
+  final Car carPainter;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.save();
+
+    canvas.translate(0, -carPainter.y + size.height * 0.7);
+
+    roadPainter.paint(canvas, size);
+    carPainter.paint(canvas, size);
+
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }

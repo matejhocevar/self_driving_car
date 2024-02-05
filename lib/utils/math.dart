@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../models/math.dart';
@@ -25,4 +27,26 @@ Position? getIntersection(Offset a, Offset b, Offset c, Offset d) {
       );
     }
   }
+}
+
+bool polysIntersect(List<Offset> p1, List<Offset> p2) {
+  for (int i = 0; i < p1.length; i++) {
+    for (int j = 0; j < p2.length; j++) {
+      Position? touch = getIntersection(
+        p1[i],
+        p1[(i + 1) % p1.length],
+        p2[j],
+        p2[(j + 1) % p2.length],
+      );
+      if (touch != null) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+double hypot(double x, double y) {
+  return math.sqrt(math.pow(x, 2) + math.pow(y, 2));
 }

@@ -2,10 +2,11 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../utils/math.dart';
 import 'controls.dart';
 import 'sensor.dart';
 
-class Car {
+class Car extends CustomPainter {
   Car({
     required this.x,
     required this.y,
@@ -34,9 +35,12 @@ class Car {
   static const double acceleration = 0.2;
   static const double maxSpeed = 3;
   static const double steerAngle = 0.03;
+  bool damaged = false;
 
   late Sensor sensor;
   Controls controls;
+
+  late List<Offset> polygon;
 
   Car copyWith({
     double? x,
@@ -59,8 +63,35 @@ class Car {
   }
 
   void update(List<List<Offset>> roadBorders) {
-    _move();
+    if (!damaged) {
+      _move();
+      polygon = _createPolygon();
+      damaged = _assessDamage(roadBorders);
+    }
     sensor.update(roadBorders);
+  }
+
+  List<Offset> _createPolygon() {
+    double radius = hypot(width, height) / 2;
+    double alpha = math.atan2(width, height);
+    return [
+      Offset(
+        x - math.sin(angle - alpha) * radius,
+        y - math.cos(angle - alpha) * radius,
+      ),
+      Offset(
+        x - math.sin(angle + alpha) * radius,
+        y - math.cos(angle + alpha) * radius,
+      ),
+      Offset(
+        x - math.sin(math.pi + angle - alpha) * radius,
+        y - math.cos(math.pi + angle - alpha) * radius,
+      ),
+      Offset(
+        x - math.sin(math.pi + angle + alpha) * radius,
+        y - math.cos(math.pi + angle + alpha) * radius,
+      ),
+    ];
   }
 
   void _move() {
@@ -101,6 +132,38 @@ class Car {
 
     x -= math.sin(angle) * speed;
     y -= math.cos(angle) * speed;
+  }
+
+  bool _assessDamage(List<List<Offset>> roadBorders) {
+    for (int i = 0; i < roadBorders.length; i++) {
+      if (polysIntersect(polygon, roadBorders[i])) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    var carPaint = Paint()
+      ..color = damaged ? Colors.redAccent : Colors.black
+      ..style = PaintingStyle.fill;
+
+    Path path = Path();
+    path.moveTo(polygon.first.dx, polygon.first.dy);
+    for (int i = 1; i < polygon.length; i++) {
+      path.lineTo(polygon[i].dx, polygon[i].dy);
+    }
+
+    canvas.drawPath(path, carPaint);
+
+    sensor.paint(canvas, size);
+  }
+
+  @override
+  bool shouldRepaint(covariant Car oldDelegate) {
+    return true;
   }
 
   @override

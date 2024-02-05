@@ -6,7 +6,7 @@ import '../utils/math.dart';
 import 'car.dart';
 import 'math.dart';
 
-class Sensor {
+class Sensor extends CustomPainter {
   Sensor({
     required this.car,
     this.rayCount = 3,
@@ -76,5 +76,28 @@ class Sensor {
     var offsets = touches.map((Position p) => p.offset);
     double minOffset = offsets.reduce(math.min);
     return touches.firstWhere((Position p) => p.offset == minOffset);
+  }
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    var readingPaint = Paint()
+      ..color = Colors.yellow
+      ..strokeWidth = 2;
+
+    var sensorPaint = Paint()
+      ..color = Colors.black
+      ..strokeWidth = 2;
+
+    for (int i = 0; i < rayCount; i++) {
+      var [Offset start, Offset end] = rays[i];
+      Offset reading = readings[i]?.position ?? end;
+      canvas.drawLine(start, reading, readingPaint);
+      canvas.drawLine(reading, end, sensorPaint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant Sensor oldDelegate) {
+    return true;
   }
 }
