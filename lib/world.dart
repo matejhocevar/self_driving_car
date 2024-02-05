@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:self_driving_car/car.dart';
+import 'package:self_driving_car/models/car.dart';
 import 'package:self_driving_car/painters/world_painter.dart';
 
-import 'controls.dart';
+import 'models/controls.dart';
+import 'models/road.dart';
 import 'painters/car_painter.dart';
 import 'painters/road_painter.dart';
-import 'road.dart';
 
 class World extends StatefulWidget {
   const World({super.key});

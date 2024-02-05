@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../car.dart';
+import '../models/car.dart';
 
 class CarPainter extends CustomPainter {
   const CarPainter({required this.car});

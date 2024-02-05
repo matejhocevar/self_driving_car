@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../road.dart';
+import '../models/road.dart';
 import '../utils/canvas.dart';
 import '../utils/math.dart';
 
