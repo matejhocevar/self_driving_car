@@ -1,6 +1,9 @@
 import 'dart:math' as math;
 
+import 'package:flutter/material.dart';
+
 import 'controls.dart';
+import 'sensor.dart';
 
 class Car {
   Car({
@@ -11,7 +14,14 @@ class Car {
     required this.controls,
     this.speed = 0,
     this.angle = 0,
-  });
+  }) {
+    sensor = Sensor(
+      car: this,
+      rayCount: 5,
+      rayLength: 150,
+      raySpread: math.pi / 2,
+    );
+  }
 
   double x;
   double y;
@@ -25,6 +35,7 @@ class Car {
   static const double maxSpeed = 3;
   static const double steerAngle = 0.03;
 
+  late Sensor sensor;
   Controls controls;
 
   Car copyWith({
@@ -47,8 +58,9 @@ class Car {
     );
   }
 
-  void update() {
+  void update(List<List<Offset>> roadBorders) {
     _move();
+    sensor.update(roadBorders);
   }
 
   void _move() {

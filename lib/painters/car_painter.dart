@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:self_driving_car/painters/sensor_painter.dart';
 
 import '../models/car.dart';
 
@@ -17,6 +18,8 @@ class CarPainter extends CustomPainter {
       Paint()..color = Colors.black,
     );
     canvas.restore();
+
+    SensorPainter(sensor: car.sensor).paint(canvas, size);
   }
 
   @override

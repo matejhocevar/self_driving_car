@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:self_driving_car/models/car.dart';
-import 'package:self_driving_car/painters/world_painter.dart';
 
+import 'models/car.dart';
 import 'models/controls.dart';
 import 'models/road.dart';
+import 'models/sensor.dart';
 import 'painters/car_painter.dart';
 import 'painters/road_painter.dart';
+import 'painters/world_painter.dart';
 
 class World extends StatefulWidget {
   const World({super.key});
@@ -18,6 +19,7 @@ class World extends StatefulWidget {
 class _WorldState extends State<World> with SingleTickerProviderStateMixin {
   late Car car;
   late Road road;
+  late Sensor sensor;
 
   late AnimationController _controller;
 
@@ -43,7 +45,7 @@ class _WorldState extends State<World> with SingleTickerProviderStateMixin {
       duration: const Duration(milliseconds: 16),
     )..addListener(() {
         setState(() {
-          car.update();
+          car.update(road.borders);
         });
       });
 
