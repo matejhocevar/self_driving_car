@@ -14,7 +14,7 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      showPerformanceOverlay: false,
+      showPerformanceOverlay: true,
       home: Container(
         color: Colors.grey,
         child: const Center(
