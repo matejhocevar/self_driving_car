@@ -20,8 +20,18 @@ class VisualiserPainter extends CustomPainter {
     double width = size.width - margin * 2;
     double height = size.height - margin * 2;
 
-    canvas.drawRect(
-      Rect.fromLTWH(0, 0, size.width, size.height),
+    const borderRadius = Radius.circular(6);
+    canvas.drawRRect(
+      RRect.fromLTRBAndCorners(
+        0,
+        0,
+        size.width,
+        size.height,
+        topLeft: borderRadius,
+        topRight: borderRadius,
+        bottomLeft: borderRadius,
+        bottomRight: borderRadius,
+      ),
       Paint()..color = VisualiserPainter.backgroundColor,
     );
 

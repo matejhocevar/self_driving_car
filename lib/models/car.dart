@@ -18,7 +18,8 @@ class Car extends CustomPainter {
     this.controlType = ControlType.dummy,
     this.speed = 0,
     this.angle = 0,
-    this.color = Colors.blue,
+    this.brain,
+    this.color,
   }) {
     useBrain = controlType == ControlType.AI;
 
@@ -29,7 +30,7 @@ class Car extends CustomPainter {
         rayLength: 150,
         raySpread: math.pi / 2,
       );
-      brain = NeuralNetwork(neuronCounts: [sensor.rayCount, 6, 4]);
+      brain = brain ?? NeuralNetwork(neuronCounts: [sensor.rayCount, 6, 4]);
     }
 
     polygon = _createPolygon();
@@ -43,7 +44,7 @@ class Car extends CustomPainter {
   double speed;
   double angle;
   double maxSpeed;
-  Color color;
+  Color? color;
 
   static const double friction = 0.05;
   static const double acceleration = 0.2;
@@ -51,9 +52,10 @@ class Car extends CustomPainter {
   bool damaged = false;
 
   late Sensor sensor;
+  bool showSensor = false;
   late Controls controls;
   final ControlType controlType;
-  late NeuralNetwork brain;
+  NeuralNetwork? brain;
   bool useBrain = false;
 
   late List<Offset> polygon;
@@ -92,7 +94,7 @@ class Car extends CustomPainter {
       List<double> offsets = sensor.readings
           .map((Position? p) => p?.offset == null ? 0.0 : 1 - p!.offset)
           .toList();
-      List<double> outputs = NeuralNetwork.feedForward(offsets, brain);
+      List<double> outputs = NeuralNetwork.feedForward(offsets, brain!);
 
       if (useBrain) {
         controls.forward = outputs[0] > 0;
@@ -184,8 +186,18 @@ class Car extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    double isAIPredicate = controlType == ControlType.AI ? 0.2 : 1;
+    Color carColor =
+        switch ((hasDefinedColor: color != null, isDamaged: damaged)) {
+      (hasDefinedColor: _, isDamaged: true) =>
+        Colors.redAccent.withOpacity(isAIPredicate),
+      (hasDefinedColor: true, isDamaged: false) => color!,
+      (hasDefinedColor: false, isDamaged: false) =>
+        Colors.blue.withOpacity(isAIPredicate),
+    };
+
     var carPaint = Paint()
-      ..color = damaged ? Colors.redAccent : color
+      ..color = carColor
       ..style = PaintingStyle.fill;
 
     Path path = Path();
@@ -196,7 +208,7 @@ class Car extends CustomPainter {
 
     canvas.drawPath(path, carPaint);
 
-    if (controlType != ControlType.dummy) {
+    if (controlType != ControlType.dummy && showSensor) {
       sensor.paint(canvas, size);
     }
   }

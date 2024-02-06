@@ -1,10 +1,15 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:self_driving_car/network.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'models/car.dart';
 import 'models/controls.dart';
 import 'models/road.dart';
 import 'models/sensor.dart';
+import 'toolbar.dart';
 import 'visualizer.dart';
 
 class World extends StatefulWidget {
@@ -15,65 +20,165 @@ class World extends StatefulWidget {
 }
 
 class _WorldState extends State<World> with SingleTickerProviderStateMixin {
-  late Car car;
-  late Road road;
-  late Sensor sensor;
-  List<Car> traffic = [];
-
+  late final SharedPreferences prefs;
   late AnimationController _controller;
 
-  final Size size = const Size(200, double.infinity);
+  bool worldLoaded = false;
+
+  List<Car> cars = [];
+  Car? bestCar;
+  late Road road;
+  final Size roadSize = const Size(200, double.infinity);
+  late Sensor sensor;
+  List<Car> traffic = [];
 
   @override
   void initState() {
     super.initState();
 
-    road = Road(x: size.width / 2, width: size.width * 0.9, laneCount: 3);
-    car = Car(
-      x: road.getLaneCenter(1),
-      y: 100,
-      width: 30,
-      height: 50,
-      controlType: ControlType.AI,
-    );
-    traffic.addAll([
-      Car(
-        x: road.getLaneCenter(1),
-        y: -100,
-        width: 30,
-        height: 50,
-        maxSpeed: 2,
-        controlType: ControlType.dummy,
-        color: Colors.purpleAccent,
-      ),
-    ]);
+    SharedPreferences.getInstance().then((p) {
+      prefs = p;
+      _generateWorld();
+    });
+  }
 
-    RawKeyboard.instance.addListener(car.controls.onKeyEvent);
+  Future<void> _generateWorld() async {
+    road = Road(
+      x: roadSize.width / 2,
+      width: roadSize.width * 0.9,
+      laneCount: 3,
+    );
+    cars.addAll(await _generateCars(n: 1000));
+    traffic.addAll(_generateTraffic());
+
+    RawKeyboard.instance.addListener(cars.first.controls.onKeyEvent);
 
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 16),
     )..addListener(() {
         setState(() {
-          car.update(road.borders, traffic);
+          cars.forEach((Car c) => c.update(road.borders, traffic));
+          _selectTheBestCar();
+
           traffic.forEach((Car c) => c.update(road.borders, []));
         });
       });
 
     _controller.repeat();
+
+    setState(() {
+      worldLoaded = true;
+    });
+  }
+
+  Future<List<Car>> _generateCars({required int n}) async {
+    List<Car> cars = [];
+    for (int i = 0; i < n; i++) {
+      cars.add(
+        Car(
+          x: road.getLaneCenter(1),
+          y: 100,
+          width: 30,
+          height: 50,
+          brain: await _loadModel(),
+          controlType: ControlType.AI,
+        ),
+      );
+
+      if (i != 0) {
+        NeuralNetwork.mutate(cars[i].brain!, amount: 0.1);
+      }
+    }
+
+    bestCar = cars.first;
+    bestCar!.showSensor = true;
+
+    return cars;
+  }
+
+  List<Car> _generateTraffic() {
+    List<({int lane, double y})> locations = [
+      (lane: 1, y: -100),
+      (lane: 0, y: -300),
+      (lane: 2, y: -300),
+      (lane: 0, y: -500),
+      (lane: 1, y: -500),
+      (lane: 1, y: -700),
+      (lane: 2, y: -700),
+      (lane: 2, y: -800),
+      (lane: 1, y: -900),
+      (lane: 0, y: -1100),
+      (lane: 0, y: -1300),
+      (lane: 2, y: -1300),
+      (lane: 1, y: -1450),
+      (lane: 0, y: -1600),
+      (lane: 2, y: -1600),
+      (lane: 1, y: -1800),
+    ];
+
+    return locations
+        .map(
+          (l) => Car(
+            x: road.getLaneCenter(l.lane),
+            y: l.y,
+            width: 30,
+            height: 50,
+            maxSpeed: 2,
+            controlType: ControlType.dummy,
+            color: Colors.purpleAccent,
+          ),
+        )
+        .toList();
+  }
+
+  void _selectTheBestCar() {
+    bestCar!.showSensor = false;
+    bestCar!.color = null;
+    double minY = cars.map((Car car) => car.y).reduce(math.min);
+    bestCar = cars.firstWhere((Car c) => c.y == minY);
+    bestCar!.showSensor = true;
+    bestCar!.color = Colors.blue;
+  }
+
+  _saveModel() async {
+    await prefs.setString('bestBrain', bestCar!.brain.toString());
+    print('Models successfully saved!');
+  }
+
+  Future<NeuralNetwork?> _loadModel() async {
+    String? brain = prefs.getString('bestBrain');
+
+    if (brain != null) {
+      print('Models successfully loaded!');
+      return NeuralNetwork.fromString(brain);
+    }
+
+    print('No model found!');
+  }
+
+  _discardModel() async {
+    await prefs.remove('bestBrain');
   }
 
   @override
   Widget build(BuildContext context) {
+    if (!worldLoaded) {
+      return const Center(
+        child: CircularProgressIndicator(color: Colors.black87),
+      );
+    }
+
     return Stack(
       alignment: Alignment.center,
       children: [
-        Container(width: size.width, color: const Color(0xFFDCDCDC)),
+        Container(width: roadSize.width, color: const Color(0xFFDCDCDC)),
         CustomPaint(
-          size: size,
+          size: roadSize,
           painter: WorldPainter(
             road: road,
-            car: car,
+            cars: cars,
+            bestCar: bestCar!,
             traffic: traffic,
           ),
         ),
@@ -82,7 +187,30 @@ class _WorldState extends State<World> with SingleTickerProviderStateMixin {
           right: 16,
           child: CustomPaint(
             size: const Size(250, 250),
-            painter: VisualiserPainter(network: car.brain),
+            painter: VisualiserPainter(network: bestCar!.brain!),
+          ),
+        ),
+        Positioned(
+          top: 16 + 250 + 8,
+          right: 16,
+          child: Toolbar(
+            size: const Size(250, 36),
+            children: [
+              IconButton(
+                icon: const Icon(Icons.save_alt),
+                iconSize: 20,
+                tooltip: 'Save model',
+                color: Colors.white,
+                onPressed: _saveModel,
+              ),
+              IconButton(
+                icon: const Icon(Icons.delete_forever),
+                iconSize: 20,
+                tooltip: 'Discard model',
+                color: Colors.white,
+                onPressed: _discardModel,
+              ),
+            ],
           ),
         ),
       ],
@@ -92,7 +220,7 @@ class _WorldState extends State<World> with SingleTickerProviderStateMixin {
   @override
   void dispose() {
     _controller.dispose();
-    RawKeyboard.instance.removeListener(car.controls.onKeyEvent);
+    RawKeyboard.instance.removeListener(cars.first.controls.onKeyEvent);
     super.dispose();
   }
 }
@@ -100,26 +228,29 @@ class _WorldState extends State<World> with SingleTickerProviderStateMixin {
 class WorldPainter extends CustomPainter {
   const WorldPainter({
     required this.road,
-    required this.car,
+    required this.cars,
+    required this.bestCar,
     required this.traffic,
   });
 
   final Road road;
-  final Car car;
+  final List<Car> cars;
+  final Car bestCar;
   final List<Car> traffic;
 
   @override
   void paint(Canvas canvas, Size size) {
     canvas.save();
 
-    canvas.translate(0, -car.y + size.height * 0.7);
+    canvas.translate(0, -bestCar.y + size.height * 0.7);
     road.paint(canvas, size);
 
     for (int i = 0; i < traffic.length; i++) {
       traffic[i].paint(canvas, size);
     }
 
-    car.paint(canvas, size);
+    cars.forEach((Car c) => c.paint(canvas, size));
+    bestCar.paint(canvas, size);
 
     canvas.restore();
   }
