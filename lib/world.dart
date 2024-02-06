@@ -3,16 +3,16 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:self_driving_car/network.dart';
-import 'package:self_driving_car/utils/progressbar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'components/progressbar.dart';
+import 'components/toolbar.dart';
+import 'components/visualizer.dart';
 import 'models/car.dart';
 import 'models/controls.dart';
 import 'models/road.dart';
 import 'models/sensor.dart';
-import 'toolbar.dart';
-import 'visualizer.dart';
+import 'network/network.dart';
 
 class World extends StatefulWidget {
   const World({super.key});
@@ -50,7 +50,7 @@ class _WorldState extends State<World> with SingleTickerProviderStateMixin {
       width: roadSize.width * 0.9,
       laneCount: 3,
     );
-    cars.addAll(await _generateCars(n: 1000));
+    cars.addAll(await _generateCars(n: 100));
     traffic.addAll(_generateTraffic());
 
     RawKeyboard.instance.addListener(cars.first.controls.onKeyEvent);

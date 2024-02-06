@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:self_driving_car/network.dart';
 
-import 'utils/math.dart';
+import '../network/level.dart';
+import '../network/network.dart';
+import '../utils/math.dart';
 
 class VisualiserPainter extends CustomPainter {
   const VisualiserPainter({

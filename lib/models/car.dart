@@ -1,8 +1,8 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:self_driving_car/network.dart';
 
+import '../network/network.dart';
 import '../utils/math.dart';
 import 'controls.dart';
 import 'math.dart';
