@@ -16,9 +16,11 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       showPerformanceOverlay: false,
-      home: Container(
-        color: Colors.grey,
-        child: const World(),
+      home: Material(
+        child: Container(
+          color: Colors.grey,
+          child: const World(),
+        ),
       ),
     );
   }

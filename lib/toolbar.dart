@@ -19,6 +19,7 @@ class Toolbar extends StatelessWidget {
         color: Colors.black87,
         borderRadius: BorderRadius.circular(6),
       ),
+      padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Row(
         children: children,
       ),

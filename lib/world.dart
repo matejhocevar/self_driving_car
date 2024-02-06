@@ -1,8 +1,10 @@
 import 'dart:math' as math;
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:self_driving_car/network.dart';
+import 'package:self_driving_car/utils/progressbar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'models/car.dart';
@@ -169,6 +171,10 @@ class _WorldState extends State<World> with SingleTickerProviderStateMixin {
       );
     }
 
+    final int drivingCars = cars.where((Car c) => !c.damaged).length;
+    final double simulationProgress =
+        clampDouble(bestCar!.y / traffic.last.y, 0, 1);
+
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -196,6 +202,15 @@ class _WorldState extends State<World> with SingleTickerProviderStateMixin {
           child: Toolbar(
             size: const Size(250, 36),
             children: [
+              const Text(
+                'Cars: ',
+                style: TextStyle(color: Colors.white),
+              ),
+              Text(
+                '$drivingCars / ${cars.length}',
+                style: const TextStyle(color: Colors.white),
+              ),
+              const Spacer(),
               IconButton(
                 icon: const Icon(Icons.save_alt),
                 iconSize: 20,
@@ -212,6 +227,11 @@ class _WorldState extends State<World> with SingleTickerProviderStateMixin {
               ),
             ],
           ),
+        ),
+        Positioned(
+          top: 16 + 250 + 8 + 32,
+          right: 16,
+          child: ProgressBar(progress: simulationProgress),
         ),
       ],
     );
