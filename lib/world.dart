@@ -8,10 +8,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'components/progressbar.dart';
 import 'components/toolbar.dart';
 import 'components/visualizer.dart';
+import 'constants/vehicles.dart';
+import 'constants/world_settings.dart';
 import 'models/car.dart';
 import 'models/controls.dart';
 import 'models/road.dart';
 import 'models/sensor.dart';
+import 'models/vehicle.dart';
 import 'network/network.dart';
 
 class World extends StatefulWidget {
@@ -30,7 +33,7 @@ class _WorldState extends State<World> with SingleTickerProviderStateMixin {
   List<Car> cars = [];
   Car? bestCar;
   late Road road;
-  final Size roadSize = const Size(200, double.infinity);
+  final Size roadSize = WorldSettings.roadSize;
   late Sensor sensor;
   List<Car> traffic = [];
 
@@ -45,12 +48,14 @@ class _WorldState extends State<World> with SingleTickerProviderStateMixin {
   }
 
   Future<void> _generateWorld() async {
+    await loadAssets();
+
     road = Road(
       x: roadSize.width / 2,
       width: roadSize.width * 0.9,
-      laneCount: 3,
+      laneCount: WorldSettings.roadLaneCount,
     );
-    cars.addAll(await _generateCars(n: 100));
+    cars.addAll(await _generateCars(n: WorldSettings.trainingCarsN));
     traffic.addAll(_generateTraffic());
 
     RawKeyboard.instance.addListener(cars.first.controls.onKeyEvent);
@@ -77,70 +82,63 @@ class _WorldState extends State<World> with SingleTickerProviderStateMixin {
   Future<List<Car>> _generateCars({required int n}) async {
     List<Car> cars = [];
     for (int i = 0; i < n; i++) {
+      Vehicle v = WorldSettings.trainingCarsModel;
       cars.add(
         Car(
           x: road.getLaneCenter(1),
-          y: 100,
-          width: 30,
-          height: 50,
+          y: WorldSettings.trainingCarsStartingY,
+          width: v.size.width,
+          height: v.size.height,
           brain: await _loadModel(),
           controlType: ControlType.AI,
+          vehicle: v,
+          vehicleOpacity: WorldSettings.trainingCarsOpacity,
         ),
       );
 
       if (i != 0) {
-        NeuralNetwork.mutate(cars[i].brain!, amount: 0.1);
+        NeuralNetwork.mutate(
+          cars[i].brain!,
+          amount: WorldSettings.neuralNetworkMutation,
+        );
       }
     }
 
     bestCar = cars.first;
-    bestCar!.showSensor = true;
+    bestCar!.showSensor = WorldSettings.sensorShowRays;
 
     return cars;
   }
 
   List<Car> _generateTraffic() {
-    List<({int lane, double y})> locations = [
-      (lane: 1, y: -100),
-      (lane: 0, y: -300),
-      (lane: 2, y: -300),
-      (lane: 0, y: -500),
-      (lane: 1, y: -500),
-      (lane: 1, y: -700),
-      (lane: 2, y: -700),
-      (lane: 2, y: -800),
-      (lane: 1, y: -900),
-      (lane: 0, y: -1100),
-      (lane: 0, y: -1300),
-      (lane: 2, y: -1300),
-      (lane: 1, y: -1450),
-      (lane: 0, y: -1600),
-      (lane: 2, y: -1600),
-      (lane: 1, y: -1800),
-    ];
+    List<Car> traffic = [];
+    for (var l in WorldSettings.trafficLocations) {
+      Vehicle v = vehicles
+          .where((v) => v != WorldSettings.trainingCarsModel)
+          .toList()[math.Random().nextInt(vehicles.length - 1)];
+      traffic.add(
+        Car(
+          x: road.getLaneCenter(l.lane),
+          y: l.y,
+          width: v.size.width,
+          height: v.size.height,
+          maxSpeed: 2,
+          controlType: ControlType.dummy,
+          vehicle: v,
+        ),
+      );
+    }
 
-    return locations
-        .map(
-          (l) => Car(
-            x: road.getLaneCenter(l.lane),
-            y: l.y,
-            width: 30,
-            height: 50,
-            maxSpeed: 2,
-            controlType: ControlType.dummy,
-            color: Colors.purpleAccent,
-          ),
-        )
-        .toList();
+    return traffic;
   }
 
   void _selectTheBestCar() {
     bestCar!.showSensor = false;
-    bestCar!.color = null;
+    bestCar!.vehicleOpacity = WorldSettings.trainingCarsOpacity;
     double minY = cars.map((Car car) => car.y).reduce(math.min);
     bestCar = cars.firstWhere((Car c) => c.y == minY);
     bestCar!.showSensor = true;
-    bestCar!.color = Colors.blue;
+    bestCar!.vehicleOpacity = 1;
   }
 
   _saveModel() async {
@@ -152,22 +150,24 @@ class _WorldState extends State<World> with SingleTickerProviderStateMixin {
     String? brain = prefs.getString('bestBrain');
 
     if (brain != null) {
-      print('Models successfully loaded!');
       return NeuralNetwork.fromString(brain);
     }
 
-    print('No model found!');
+    return null;
   }
 
   _discardModel() async {
     await prefs.remove('bestBrain');
+    print('Models disposed!');
   }
 
   @override
   Widget build(BuildContext context) {
     if (!worldLoaded) {
       return const Center(
-        child: CircularProgressIndicator(color: Colors.black87),
+        child: CircularProgressIndicator(
+          color: WorldSettings.visualisationBackgroundColor,
+        ),
       );
     }
 
@@ -189,18 +189,20 @@ class _WorldState extends State<World> with SingleTickerProviderStateMixin {
           ),
         ),
         Positioned(
-          top: 16,
-          right: 16,
+          top: WorldSettings.visualisationMargin,
+          right: WorldSettings.visualisationMargin,
           child: CustomPaint(
-            size: const Size(250, 250),
+            size: WorldSettings.visualisationNetworkGraphSize,
             painter: VisualiserPainter(network: bestCar!.brain!),
           ),
         ),
         Positioned(
-          top: 16 + 250 + 8,
-          right: 16,
+          top: WorldSettings.visualisationMargin +
+              WorldSettings.visualisationNetworkGraphSize.height +
+              8,
+          right: WorldSettings.visualisationMargin,
           child: Toolbar(
-            size: const Size(250, 36),
+            size: WorldSettings.visualisationToolbarSize,
             children: [
               const Text(
                 'Cars: ',
@@ -229,8 +231,12 @@ class _WorldState extends State<World> with SingleTickerProviderStateMixin {
           ),
         ),
         Positioned(
-          top: 16 + 250 + 8 + 32,
-          right: 16,
+          top: WorldSettings.visualisationMargin +
+              WorldSettings.visualisationNetworkGraphSize.height +
+              8 +
+              (WorldSettings.visualisationToolbarSize.height -
+                  WorldSettings.visualisationToolbarSize.height),
+          right: WorldSettings.visualisationMargin,
           child: ProgressBar(progress: simulationProgress),
         ),
       ],

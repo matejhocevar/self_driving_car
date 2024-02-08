@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../constants/world_settings.dart';
 import '../network/level.dart';
 import '../network/network.dart';
 import '../utils/math.dart';
@@ -11,17 +12,18 @@ class VisualiserPainter extends CustomPainter {
 
   final NeuralNetwork network;
 
-  final double margin = 32;
-  static const Color backgroundColor = Colors.black87;
+  final double padding = 32;
+  static const Color backgroundColor =
+      WorldSettings.visualisationBackgroundColor;
 
   @override
   void paint(Canvas canvas, Size size) {
-    double top = margin;
-    double left = margin;
-    double width = size.width - margin * 2;
-    double height = size.height - margin * 2;
+    double top = padding;
+    double left = padding;
+    double width = size.width - padding * 2;
+    double height = size.height - padding * 2;
 
-    const borderRadius = Radius.circular(6);
+    const borderRadius = WorldSettings.visualisationRadius;
     canvas.drawRRect(
       RRect.fromLTRBAndCorners(
         0,

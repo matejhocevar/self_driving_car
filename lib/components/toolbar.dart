@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../constants/world_settings.dart';
+
 class Toolbar extends StatelessWidget {
   const Toolbar({
     super.key,
@@ -15,9 +17,9 @@ class Toolbar extends StatelessWidget {
     return Container(
       width: size.width,
       height: size.height,
-      decoration: BoxDecoration(
-        color: Colors.black87,
-        borderRadius: BorderRadius.circular(6),
+      decoration: const BoxDecoration(
+        color: WorldSettings.visualisationBackgroundColor,
+        borderRadius: BorderRadius.all(WorldSettings.visualisationRadius),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Row(

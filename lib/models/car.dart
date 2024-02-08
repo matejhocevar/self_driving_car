@@ -2,11 +2,13 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../constants/world_settings.dart';
 import '../network/network.dart';
 import '../utils/math.dart';
 import 'controls.dart';
 import 'math.dart';
 import 'sensor.dart';
+import 'vehicle.dart';
 
 class Car extends CustomPainter {
   Car({
@@ -19,18 +21,24 @@ class Car extends CustomPainter {
     this.speed = 0,
     this.angle = 0,
     this.brain,
-    this.color,
+    this.vehicle,
+    this.vehicleOpacity = 1,
   }) {
     useBrain = controlType == ControlType.AI;
 
     if (controlType != ControlType.dummy) {
       sensor = Sensor(
         car: this,
-        rayCount: 5,
-        rayLength: 150,
-        raySpread: math.pi / 2,
+        rayCount: WorldSettings.sensorRayCount,
+        rayLength: WorldSettings.sensorRayLength,
+        raySpread: WorldSettings.sensorRaySpread,
       );
-      brain = brain ?? NeuralNetwork(neuronCounts: [sensor.rayCount, 6, 4]);
+      brain = brain ??
+          NeuralNetwork(neuronCounts: [
+            sensor.rayCount,
+            WorldSettings.neuralNetworkLevel1Count,
+            WorldSettings.neuralNetworkOutputCount,
+          ]);
     }
 
     polygon = _createPolygon();
@@ -44,17 +52,21 @@ class Car extends CustomPainter {
   double speed;
   double angle;
   double maxSpeed;
-  Color? color;
 
-  static const double friction = 0.05;
-  static const double acceleration = 0.2;
-  static const double steerAngle = 0.03;
+  Vehicle? vehicle;
+  double vehicleOpacity;
+
+  static const double friction = WorldSettings.trainingCarsFriction;
+  static const double acceleration = WorldSettings.trainingCarsAcceleration;
+  static const double steerAngle = WorldSettings.trainingCarsSteerAngle;
   bool damaged = false;
 
   late Sensor sensor;
   bool showSensor = false;
+
   late Controls controls;
   final ControlType controlType;
+
   NeuralNetwork? brain;
   bool useBrain = false;
 
@@ -68,7 +80,8 @@ class Car extends CustomPainter {
     double? speed,
     double? angle,
     ControlType? controlType,
-    Color? color,
+    Vehicle? vehicle,
+    double? vehicleOpacity,
   }) {
     return Car(
       x: x ?? this.x,
@@ -78,7 +91,8 @@ class Car extends CustomPainter {
       controlType: controlType ?? this.controlType,
       speed: speed ?? this.speed,
       angle: angle ?? this.angle,
-      color: color ?? this.color,
+      vehicle: vehicle ?? this.vehicle,
+      vehicleOpacity: vehicleOpacity ?? this.vehicleOpacity,
     );
   }
 
@@ -186,27 +200,25 @@ class Car extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    double isAIPredicate = controlType == ControlType.AI ? 0.2 : 1;
-    Color carColor =
-        switch ((hasDefinedColor: color != null, isDamaged: damaged)) {
-      (hasDefinedColor: _, isDamaged: true) =>
-        Colors.redAccent.withOpacity(isAIPredicate),
-      (hasDefinedColor: true, isDamaged: false) => color!,
-      (hasDefinedColor: false, isDamaged: false) =>
-        Colors.blue.withOpacity(isAIPredicate),
-    };
+    canvas.save();
 
-    var carPaint = Paint()
-      ..color = carColor
-      ..style = PaintingStyle.fill;
+    canvas.translate(x, y);
+    canvas.rotate(-angle);
+    paintImage(
+      canvas: canvas,
+      rect: Rect.fromPoints(
+        Offset(-width / 2, -height / 2),
+        Offset(width / 2, height / 2),
+      ),
+      image: vehicle!.image!,
+      fit: BoxFit.scaleDown,
+      colorFilter: damaged
+          ? const ColorFilter.mode(Colors.redAccent, BlendMode.srcIn)
+          : null,
+      opacity: damaged ? 0.2 : vehicleOpacity,
+    );
 
-    Path path = Path();
-    path.moveTo(polygon.first.dx, polygon.first.dy);
-    for (int i = 1; i < polygon.length; i++) {
-      path.lineTo(polygon[i].dx, polygon[i].dy);
-    }
-
-    canvas.drawPath(path, carPaint);
+    canvas.restore();
 
     if (controlType != ControlType.dummy && showSensor) {
       sensor.paint(canvas, size);

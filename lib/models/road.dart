@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../constants/world_settings.dart';
 import '../utils/canvas.dart';
 import '../utils/math.dart';
 
@@ -19,7 +20,7 @@ class Road extends CustomPainter {
     ];
   }
 
-  static const double infinity = 10000;
+  static const double infinity = WorldSettings.roadInfinity;
 
   final double x;
   final double width;

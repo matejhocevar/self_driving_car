@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../constants/world_settings.dart';
 import '../utils/math.dart';
 
 class ProgressBar extends StatelessWidget {
@@ -10,15 +11,15 @@ class ProgressBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const BorderRadius borderRadius = BorderRadius.only(
-      bottomLeft: Radius.circular(6),
-      bottomRight: Radius.circular(6),
+      bottomLeft: WorldSettings.visualisationRadius,
+      bottomRight: WorldSettings.visualisationRadius,
     );
 
     return Stack(
       children: [
         Container(
-          height: 4,
-          width: 250,
+          height: WorldSettings.visualisationProgressBarSize.height,
+          width: WorldSettings.visualisationProgressBarSize.width,
           decoration: const BoxDecoration(
             color: Colors.white,
             borderRadius: borderRadius,
@@ -28,10 +29,15 @@ class ProgressBar extends StatelessWidget {
           bottom: 0,
           right: 0,
           child: Container(
-            height: 4,
-            width: 250 - lerp(0, 250, progress),
+            height: WorldSettings.visualisationProgressBarSize.height,
+            width: WorldSettings.visualisationProgressBarSize.width -
+                lerp(
+                  0,
+                  WorldSettings.visualisationProgressBarSize.width,
+                  progress,
+                ),
             decoration: const BoxDecoration(
-              color: Colors.black87,
+              color: WorldSettings.visualisationBackgroundColor,
               borderRadius: borderRadius,
             ),
           ),
