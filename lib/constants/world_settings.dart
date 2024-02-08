@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../models/controls.dart';
 import '../models/vehicle.dart';
 import 'vehicles.dart';
 
@@ -15,6 +16,7 @@ class WorldSettings {
 
   // Training car
   static const int trainingCarsN = 500;
+  static const ControlType controlType = ControlType.AI;
   static Vehicle trainingCarsModel = vehicles[1];
   static const double trainingCarsStartingY = 100;
   static const double trainingCarsOpacity = 0.2;

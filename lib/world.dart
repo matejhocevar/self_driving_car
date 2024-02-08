@@ -90,7 +90,7 @@ class _WorldState extends State<World> with SingleTickerProviderStateMixin {
           width: v.size.width,
           height: v.size.height,
           brain: await _loadModel(),
-          controlType: ControlType.AI,
+          controlType: WorldSettings.controlType,
           vehicle: v,
           vehicleOpacity: WorldSettings.trainingCarsOpacity,
         ),
