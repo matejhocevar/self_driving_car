@@ -235,7 +235,7 @@ class _WorldState extends State<World> with SingleTickerProviderStateMixin {
               WorldSettings.visualisationNetworkGraphSize.height +
               8 +
               (WorldSettings.visualisationToolbarSize.height -
-                  WorldSettings.visualisationToolbarSize.height),
+                  WorldSettings.visualisationProgressBarSize.height),
           right: WorldSettings.visualisationMargin,
           child: ProgressBar(progress: simulationProgress),
         ),
