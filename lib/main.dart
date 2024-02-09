@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:self_driving_car/virtual_world/virtual_world.dart';
+import 'package:self_driving_car/virtual_world/world_host.dart';
 
 void main() {
   debugRepaintRainbowEnabled = true;
@@ -18,7 +18,7 @@ class MainApp extends StatelessWidget {
       home: Material(
         child: Container(
           color: Colors.grey,
-          child: const VirtualWorld(),
+          child: const WorldHost(),
         ),
       ),
     );

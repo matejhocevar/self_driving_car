@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 
 class VirtualWorldSettings {
+  // Viewport
+  static const double viewportZoomStep = 0.1;
+  static const double viewportZoomMin = 1;
+  static const double viewportZoomMax = 5;
+
   // Graph Editor
   static Paint graphEditorSelectedPaint = Paint()
     ..color = Colors.yellow

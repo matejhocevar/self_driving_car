@@ -5,11 +5,17 @@ import '../../common/primitives/segment.dart';
 import '../../utils/math.dart';
 import '../graph.dart';
 import '../settings.dart';
+import '../viewport.dart';
 
 class GraphEditor extends StatefulWidget {
-  const GraphEditor({super.key, required this.graph});
+  const GraphEditor({
+    super.key,
+    required this.graph,
+    required this.viewport,
+  });
 
   final Graph graph;
+  final ViewPort viewport;
 
   @override
   State<GraphEditor> createState() => _GraphEditorState();
@@ -17,6 +23,7 @@ class GraphEditor extends StatefulWidget {
 
 class _GraphEditorState extends State<GraphEditor> {
   late Graph graph;
+  late ViewPort viewport;
 
   Point? selected;
   Point? hovered;
@@ -29,6 +36,7 @@ class _GraphEditorState extends State<GraphEditor> {
     super.initState();
 
     graph = widget.graph;
+    viewport = widget.viewport;
   }
 
   void _removePoint(Point? p) {
@@ -52,8 +60,19 @@ class _GraphEditorState extends State<GraphEditor> {
     selected = point;
   }
 
+  void _handleHover(event) {
+    mouse = viewport.getMouse(Point.fromOffset(event.localPosition));
+    hovered = getNearestPoint(
+      mouse!,
+      graph.points,
+      threshold:
+          VirtualWorldSettings.graphEditorSelectedThreshold * viewport.zoom,
+    );
+    setState(() {});
+  }
+
   void _handleTapDown(TapDownDetails tap) {
-    Point p = Point.fromOffset(tap.localPosition);
+    Point p = viewport.getMouse(Point.fromOffset(tap.localPosition));
     if (hovered != null) {
       _select(hovered!);
 
@@ -69,21 +88,29 @@ class _GraphEditorState extends State<GraphEditor> {
     }
   }
 
-  void _handleDragStart(drag) {
-    setState(() {
-      isDragging = true;
-      if (selected != hovered) {
-        selected = hovered;
-      }
-    });
+  void handleDragStart(drag) {
+    isDragging = true;
+    if (selected != hovered) {
+      selected = hovered;
+    }
+
+    viewport.handlePanStart(Point.fromOffset(drag.localPosition));
+    setState(() {});
   }
 
   void _handleDragUpdate(drag) {
     if (isDragging && selected != null) {
-      selected!.x = drag.localPosition.dx;
-      selected!.y = drag.localPosition.dy;
-      setState(() {});
+      Point p = viewport.getMouse(
+        Point.fromOffset(drag.localPosition),
+        subtractDragOffset: true,
+      );
+      selected!.x = p.x;
+      selected!.y = p.y;
+    } else {
+      viewport.handlePanUpdate(Point.fromOffset(drag.localPosition));
     }
+
+    setState(() {});
   }
 
   void _handleDragEnd(_) {
@@ -91,6 +118,7 @@ class _GraphEditorState extends State<GraphEditor> {
     if (selected != null) {
       selected = null;
     }
+    viewport.handlePanEnd();
     setState(() {});
   }
 
@@ -106,24 +134,17 @@ class _GraphEditorState extends State<GraphEditor> {
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
-      onHover: (event) {
-        mouse = Point.fromOffset(event.localPosition);
-        hovered = getNearestPoint(
-          mouse!,
-          graph.points,
-          threshold: VirtualWorldSettings.graphEditorSelectedThreshold,
-        );
-        setState(() {});
-      },
+      onHover: _handleHover,
       child: GestureDetector(
         onTapDown: _handleTapDown,
-        onPanStart: _handleDragStart,
+        onPanStart: handleDragStart,
         onPanUpdate: _handleDragUpdate,
         onPanEnd: _handleDragEnd,
         onSecondaryTapDown: _handleSecondaryTapDown,
         child: CustomPaint(
-          painter: GraphEditorCustomPainter(
+          painter: GraphEditorPainter(
             graph: widget.graph,
+            viewport: widget.viewport,
             selected: selected,
             hovered: hovered,
             mouse: mouse,
@@ -134,15 +155,17 @@ class _GraphEditorState extends State<GraphEditor> {
   }
 }
 
-class GraphEditorCustomPainter extends CustomPainter {
-  const GraphEditorCustomPainter({
+class GraphEditorPainter extends CustomPainter {
+  const GraphEditorPainter({
     required this.graph,
+    required this.viewport,
     this.selected,
     this.hovered,
     this.mouse,
   });
 
   final Graph graph;
+  final ViewPort viewport;
   final Point? selected;
   final Point? hovered;
   final Point? mouse;
@@ -151,6 +174,12 @@ class GraphEditorCustomPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     canvas.drawPaint(Paint()..color = Colors.green);
 
+    canvas.save();
+
+    canvas.translate(viewport.center.x, viewport.center.y);
+    canvas.scale(1 / viewport.zoom, 1 / viewport.zoom);
+    Point offset = viewport.getOffset();
+    canvas.translate(offset.x, offset.y);
     graph.paint(canvas, size);
 
     if (selected != null) {
@@ -164,9 +193,10 @@ class GraphEditorCustomPainter extends CustomPainter {
     if (hovered != null) {
       hovered!.paint(canvas, size, fill: true);
     }
+
+    canvas.restore();
   }
 
   @override
-  bool shouldRepaint(covariant GraphEditorCustomPainter oldDelegate) =>
-      oldDelegate.graph == graph;
+  bool shouldRepaint(covariant GraphEditorPainter oldDelegate) => true;
 }

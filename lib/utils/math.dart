@@ -74,6 +74,18 @@ double hypot(double x, double y) {
   return math.sqrt(math.pow(x, 2) + math.pow(y, 2));
 }
 
+Point add(Point p1, Point p2) {
+  return Point(p1.x + p2.x, p1.y + p2.y);
+}
+
+Point subtract(Point p1, Point p2) {
+  return Point(p1.x - p2.x, p1.y - p2.y);
+}
+
+Point scale(Point p, double scale) {
+  return Point(p.x * scale, p.y * scale);
+}
+
 extension RGBA on double {
   Color toRGBA() {
     double value = this;

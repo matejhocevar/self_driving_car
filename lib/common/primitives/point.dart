@@ -52,6 +52,11 @@ class Point extends CustomPainter {
       oldDelegate != this;
 
   @override
+  String toString() {
+    return 'Point($x, $y)';
+  }
+
+  @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         other is Point && x == other.x && y == other.y;
