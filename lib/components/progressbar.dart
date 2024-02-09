@@ -20,8 +20,8 @@ class ProgressBar extends StatelessWidget {
         Container(
           height: WorldSettings.visualisationProgressBarSize.height,
           width: WorldSettings.visualisationProgressBarSize.width,
-          decoration: const BoxDecoration(
-            color: Colors.white,
+          decoration: BoxDecoration(
+            color: progress == 1 ? Colors.green : Colors.white,
             borderRadius: borderRadius,
           ),
         ),

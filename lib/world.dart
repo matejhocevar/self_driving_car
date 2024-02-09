@@ -31,11 +31,13 @@ class _WorldState extends State<World> with TickerProviderStateMixin {
   bool worldLoaded = false;
 
   List<Car> cars = [];
-  Car? bestCar;
   late Road road;
   final Size roadSize = WorldSettings.roadSize;
   late Sensor sensor;
   List<Car> traffic = [];
+
+  Car? bestCar;
+  double bestY = 0.01;
 
   @override
   void initState() {
@@ -75,7 +77,14 @@ class _WorldState extends State<World> with TickerProviderStateMixin {
     setState(() {
       road.update(bestCar!.y);
 
-      cars.forEach((Car c) => c.update(road.borders, traffic));
+      cars.forEach((Car c) {
+        c.update(road.borders, traffic);
+
+        // Damage car if it lags behind
+        if (c.y - bestCar!.y > 500) {
+          c.damaged = true;
+        }
+      });
       _selectTheBestCar();
 
       traffic.forEach((Car c) => c.update(road.borders, []));
@@ -146,11 +155,13 @@ class _WorldState extends State<World> with TickerProviderStateMixin {
 
   _saveModel() async {
     await prefs.setString('bestBrain', bestCar!.brain.toString());
+    await prefs.setDouble('bestY', bestCar!.y);
     print('Models successfully saved!');
   }
 
   Future<NeuralNetwork?> _loadModel() async {
     String? brain = prefs.getString('bestBrain');
+    bestY = prefs.getDouble('bestY') ?? bestY;
 
     if (brain != null) {
       return NeuralNetwork.fromString(brain);
@@ -161,6 +172,7 @@ class _WorldState extends State<World> with TickerProviderStateMixin {
 
   _discardModel() async {
     await prefs.remove('bestBrain');
+    await prefs.remove('bestY');
     print('Models disposed!');
   }
 
@@ -190,8 +202,7 @@ class _WorldState extends State<World> with TickerProviderStateMixin {
     }
 
     final int drivingCars = cars.where((Car c) => !c.damaged).length;
-    final double simulationProgress =
-        clampDouble(bestCar!.y / traffic.last.y, 0, 1);
+    final double simulationProgress = clampDouble(bestCar!.y / bestY, 0, 1);
 
     return Stack(
       alignment: Alignment.center,
