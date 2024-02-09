@@ -5,34 +5,35 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../common/car.dart';
+import '../common/constants/vehicles.dart';
+import '../common/controls.dart';
+import '../common/sensor.dart';
+import '../common/vehicle.dart';
+import '../network/neural_network.dart';
 import 'components/progressbar.dart';
 import 'components/toolbar.dart';
 import 'components/visualizer.dart';
-import 'constants/vehicles.dart';
-import 'constants/world_settings.dart';
-import 'models/car.dart';
-import 'models/controls.dart';
-import 'models/road.dart';
-import 'models/sensor.dart';
-import 'models/vehicle.dart';
-import 'network/network.dart';
+import 'constants/settings.dart';
+import 'road.dart';
 
-class World extends StatefulWidget {
-  const World({super.key});
+class InfinityRoad extends StatefulWidget {
+  const InfinityRoad({super.key});
 
   @override
-  State<World> createState() => _WorldState();
+  State<InfinityRoad> createState() => _InfinityRoadState();
 }
 
-class _WorldState extends State<World> with TickerProviderStateMixin {
+class _InfinityRoadState extends State<InfinityRoad>
+    with TickerProviderStateMixin {
   late final SharedPreferences prefs;
   AnimationController? _controller;
 
-  bool worldLoaded = false;
+  bool infinityRoadLoaded = false;
 
   List<Car> cars = [];
   late Road road;
-  final Size roadSize = WorldSettings.roadSize;
+  final Size roadSize = InfinityRoadSettings.roadSize;
   late Sensor sensor;
   List<Car> traffic = [];
 
@@ -45,19 +46,19 @@ class _WorldState extends State<World> with TickerProviderStateMixin {
 
     SharedPreferences.getInstance().then((p) {
       prefs = p;
-      _generateWorld();
+      _generateInfinityRoad();
     });
   }
 
-  Future<void> _generateWorld() async {
+  Future<void> _generateInfinityRoad() async {
     await loadAssets();
 
     road = Road(
       x: roadSize.width / 2,
       width: roadSize.width * 0.9,
-      laneCount: WorldSettings.roadLaneCount,
+      laneCount: InfinityRoadSettings.roadLaneCount,
     );
-    cars.addAll(await _generateCars(n: WorldSettings.trainingCarsN));
+    cars.addAll(await _generateCars(n: InfinityRoadSettings.trainingCarsN));
     traffic.addAll(_generateTraffic());
     RawKeyboard.instance.addListener(cars.first.controls.onKeyEvent);
 
@@ -69,7 +70,7 @@ class _WorldState extends State<World> with TickerProviderStateMixin {
     _controller!.repeat();
 
     setState(() {
-      worldLoaded = true;
+      infinityRoadLoaded = true;
     });
   }
 
@@ -94,39 +95,39 @@ class _WorldState extends State<World> with TickerProviderStateMixin {
   Future<List<Car>> _generateCars({required int n}) async {
     List<Car> cars = [];
     for (int i = 0; i < n; i++) {
-      Vehicle v = WorldSettings.trainingCarsModel;
+      Vehicle v = InfinityRoadSettings.trainingCarsModel;
       cars.add(
         Car(
           x: road.getLaneCenter(1),
-          y: WorldSettings.trainingCarsStartingY,
+          y: InfinityRoadSettings.trainingCarsStartingY,
           width: v.size.width,
           height: v.size.height,
           brain: await _loadModel(),
-          controlType: WorldSettings.controlType,
+          controlType: InfinityRoadSettings.controlType,
           vehicle: v,
-          vehicleOpacity: WorldSettings.trainingCarsOpacity,
+          vehicleOpacity: InfinityRoadSettings.trainingCarsOpacity,
         ),
       );
 
       if (i != 0) {
         NeuralNetwork.mutate(
           cars[i].brain!,
-          amount: WorldSettings.neuralNetworkMutation,
+          amount: InfinityRoadSettings.neuralNetworkMutation,
         );
       }
     }
 
     bestCar = cars.first;
-    bestCar!.showSensor = WorldSettings.sensorShowRays;
+    bestCar!.showSensor = InfinityRoadSettings.sensorShowRays;
 
     return cars;
   }
 
   List<Car> _generateTraffic() {
     List<Car> traffic = [];
-    for (var l in WorldSettings.trafficLocations) {
+    for (var l in InfinityRoadSettings.trafficLocations) {
       Vehicle v = vehicles
-          .where((v) => v != WorldSettings.trainingCarsModel)
+          .where((v) => v != InfinityRoadSettings.trainingCarsModel)
           .toList()[math.Random().nextInt(vehicles.length - 1)];
       traffic.add(
         Car(
@@ -146,7 +147,7 @@ class _WorldState extends State<World> with TickerProviderStateMixin {
 
   void _selectTheBestCar() {
     bestCar!.showSensor = false;
-    bestCar!.vehicleOpacity = WorldSettings.trainingCarsOpacity;
+    bestCar!.vehicleOpacity = InfinityRoadSettings.trainingCarsOpacity;
     double minY = cars.map((Car car) => car.y).reduce(math.min);
     bestCar = cars.firstWhere((Car c) => c.y == minY);
     bestCar!.showSensor = true;
@@ -183,20 +184,20 @@ class _WorldState extends State<World> with TickerProviderStateMixin {
       _controller!.dispose();
       _controller = null;
 
-      worldLoaded = false;
+      infinityRoadLoaded = false;
       cars = [];
       traffic = [];
     });
 
-    _generateWorld();
+    _generateInfinityRoad();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (!worldLoaded) {
+    if (!infinityRoadLoaded) {
       return const Center(
         child: CircularProgressIndicator(
-          color: WorldSettings.visualisationBackgroundColor,
+          color: InfinityRoadSettings.visualisationBackgroundColor,
         ),
       );
     }
@@ -210,7 +211,7 @@ class _WorldState extends State<World> with TickerProviderStateMixin {
         Container(width: roadSize.width, color: const Color(0xFFDCDCDC)),
         CustomPaint(
           size: roadSize,
-          painter: WorldPainter(
+          painter: InfinityRoadPainter(
             road: road,
             cars: cars,
             bestCar: bestCar!,
@@ -218,20 +219,20 @@ class _WorldState extends State<World> with TickerProviderStateMixin {
           ),
         ),
         Positioned(
-          top: WorldSettings.visualisationMargin,
-          right: WorldSettings.visualisationMargin,
+          top: InfinityRoadSettings.visualisationMargin,
+          right: InfinityRoadSettings.visualisationMargin,
           child: CustomPaint(
-            size: WorldSettings.visualisationNetworkGraphSize,
+            size: InfinityRoadSettings.visualisationNetworkGraphSize,
             painter: VisualiserPainter(network: bestCar!.brain!),
           ),
         ),
         Positioned(
-          top: WorldSettings.visualisationMargin +
-              WorldSettings.visualisationNetworkGraphSize.height +
+          top: InfinityRoadSettings.visualisationMargin +
+              InfinityRoadSettings.visualisationNetworkGraphSize.height +
               8,
-          right: WorldSettings.visualisationMargin,
+          right: InfinityRoadSettings.visualisationMargin,
           child: Toolbar(
-            size: WorldSettings.visualisationToolbarSize,
+            size: InfinityRoadSettings.visualisationToolbarSize,
             children: [
               const Text(
                 'Cars: ',
@@ -271,12 +272,12 @@ class _WorldState extends State<World> with TickerProviderStateMixin {
           ),
         ),
         Positioned(
-          top: WorldSettings.visualisationMargin +
-              WorldSettings.visualisationNetworkGraphSize.height +
+          top: InfinityRoadSettings.visualisationMargin +
+              InfinityRoadSettings.visualisationNetworkGraphSize.height +
               8 +
-              (WorldSettings.visualisationToolbarSize.height -
-                  WorldSettings.visualisationProgressBarSize.height),
-          right: WorldSettings.visualisationMargin,
+              (InfinityRoadSettings.visualisationToolbarSize.height -
+                  InfinityRoadSettings.visualisationProgressBarSize.height),
+          right: InfinityRoadSettings.visualisationMargin,
           child: ProgressBar(progress: simulationProgress),
         ),
       ],
@@ -291,8 +292,8 @@ class _WorldState extends State<World> with TickerProviderStateMixin {
   }
 }
 
-class WorldPainter extends CustomPainter {
-  const WorldPainter({
+class InfinityRoadPainter extends CustomPainter {
+  const InfinityRoadPainter({
     required this.road,
     required this.cars,
     required this.bestCar,

@@ -2,11 +2,11 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../constants/world_settings.dart';
-import '../network/network.dart';
+import '../infinity_road/constants/settings.dart';
+import '../network/neural_network.dart';
 import '../utils/math.dart';
 import 'controls.dart';
-import 'math.dart';
+import 'position.dart';
 import 'sensor.dart';
 import 'vehicle.dart';
 
@@ -29,15 +29,15 @@ class Car extends CustomPainter {
     if (controlType != ControlType.dummy) {
       sensor = Sensor(
         car: this,
-        rayCount: WorldSettings.sensorRayCount,
-        rayLength: WorldSettings.sensorRayLength,
-        raySpread: WorldSettings.sensorRaySpread,
+        rayCount: InfinityRoadSettings.sensorRayCount,
+        rayLength: InfinityRoadSettings.sensorRayLength,
+        raySpread: InfinityRoadSettings.sensorRaySpread,
       );
       brain = brain ??
           NeuralNetwork(neuronCounts: [
             sensor.rayCount,
-            WorldSettings.neuralNetworkLevel1Count,
-            WorldSettings.neuralNetworkOutputCount,
+            InfinityRoadSettings.neuralNetworkLevel1Count,
+            InfinityRoadSettings.neuralNetworkOutputCount,
           ]);
     }
 
@@ -56,9 +56,10 @@ class Car extends CustomPainter {
   Vehicle? vehicle;
   double vehicleOpacity;
 
-  static const double friction = WorldSettings.trainingCarsFriction;
-  static const double acceleration = WorldSettings.trainingCarsAcceleration;
-  static const double steerAngle = WorldSettings.trainingCarsSteerAngle;
+  static const double friction = InfinityRoadSettings.trainingCarsFriction;
+  static const double acceleration =
+      InfinityRoadSettings.trainingCarsAcceleration;
+  static const double steerAngle = InfinityRoadSettings.trainingCarsSteerAngle;
   bool damaged = false;
 
   late Sensor sensor;

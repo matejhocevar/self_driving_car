@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../constants/world_settings.dart';
+import '../constants/settings.dart';
 
 class Toolbar extends StatelessWidget {
   const Toolbar({
@@ -18,8 +18,9 @@ class Toolbar extends StatelessWidget {
       width: size.width,
       height: size.height,
       decoration: const BoxDecoration(
-        color: WorldSettings.visualisationBackgroundColor,
-        borderRadius: BorderRadius.all(WorldSettings.visualisationRadius),
+        color: InfinityRoadSettings.visualisationBackgroundColor,
+        borderRadius:
+            BorderRadius.all(InfinityRoadSettings.visualisationRadius),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Row(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../constants/world_settings.dart';
-import '../utils/math.dart';
+import '../../utils/math.dart';
+import '../constants/settings.dart';
 
 class ProgressBar extends StatelessWidget {
   const ProgressBar({super.key, required this.progress});
@@ -11,15 +11,15 @@ class ProgressBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const BorderRadius borderRadius = BorderRadius.only(
-      bottomLeft: WorldSettings.visualisationRadius,
-      bottomRight: WorldSettings.visualisationRadius,
+      bottomLeft: InfinityRoadSettings.visualisationRadius,
+      bottomRight: InfinityRoadSettings.visualisationRadius,
     );
 
     return Stack(
       children: [
         Container(
-          height: WorldSettings.visualisationProgressBarSize.height,
-          width: WorldSettings.visualisationProgressBarSize.width,
+          height: InfinityRoadSettings.visualisationProgressBarSize.height,
+          width: InfinityRoadSettings.visualisationProgressBarSize.width,
           decoration: BoxDecoration(
             color: progress == 1 ? Colors.green : Colors.white,
             borderRadius: borderRadius,
@@ -29,15 +29,15 @@ class ProgressBar extends StatelessWidget {
           bottom: 0,
           right: 0,
           child: Container(
-            height: WorldSettings.visualisationProgressBarSize.height,
-            width: WorldSettings.visualisationProgressBarSize.width -
+            height: InfinityRoadSettings.visualisationProgressBarSize.height,
+            width: InfinityRoadSettings.visualisationProgressBarSize.width -
                 lerp(
                   0,
-                  WorldSettings.visualisationProgressBarSize.width,
+                  InfinityRoadSettings.visualisationProgressBarSize.width,
                   progress,
                 ),
             decoration: const BoxDecoration(
-              color: WorldSettings.visualisationBackgroundColor,
+              color: InfinityRoadSettings.visualisationBackgroundColor,
               borderRadius: borderRadius,
             ),
           ),

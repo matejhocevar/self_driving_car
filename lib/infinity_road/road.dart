@@ -2,9 +2,9 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../constants/world_settings.dart';
 import '../utils/canvas.dart';
 import '../utils/math.dart';
+import 'constants/settings.dart';
 
 class Road extends CustomPainter {
   Road({
@@ -28,8 +28,8 @@ class Road extends CustomPainter {
   late final double right;
   late List<List<Offset>> borders;
 
-  double top = -WorldSettings.roadInfinity;
-  double bottom = WorldSettings.roadInfinity;
+  double top = -InfinityRoadSettings.roadInfinity;
+  double bottom = InfinityRoadSettings.roadInfinity;
 
   Road copyWith({
     double? x,
@@ -51,9 +51,9 @@ class Road extends CustomPainter {
   }
 
   void update(double offsetY) {
-    if ((top - offsetY).abs() < WorldSettings.roadRedrawThreshold) {
-      top += -WorldSettings.roadInfinity;
-      bottom += -WorldSettings.roadInfinity;
+    if ((top - offsetY).abs() < InfinityRoadSettings.roadRedrawThreshold) {
+      top += -InfinityRoadSettings.roadInfinity;
+      bottom += -InfinityRoadSettings.roadInfinity;
 
       borders = [
         [Offset(left, top), Offset(left, bottom)],

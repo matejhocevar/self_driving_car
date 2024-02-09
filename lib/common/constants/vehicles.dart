@@ -1,4 +1,4 @@
-import '../models/vehicle.dart';
+import '../vehicle.dart';
 
 final List<Vehicle> vehicles = [
   Vehicle(name: 'car_race_black', type: VehicleType.carRace),

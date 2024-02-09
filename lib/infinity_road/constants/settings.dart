@@ -2,12 +2,12 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../models/controls.dart';
-import '../models/vehicle.dart';
-import 'vehicles.dart';
+import '../../common/constants/vehicles.dart';
+import '../../common/controls.dart';
+import '../../common/vehicle.dart';
 
-class WorldSettings {
-  WorldSettings._();
+class InfinityRoadSettings {
+  InfinityRoadSettings._();
 
   // Road
   static const Size roadSize = Size(200, double.infinity);

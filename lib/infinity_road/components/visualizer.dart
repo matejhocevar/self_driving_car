@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../constants/world_settings.dart';
-import '../network/level.dart';
-import '../network/network.dart';
-import '../utils/math.dart';
+import '../../network/level.dart';
+import '../../network/neural_network.dart';
+import '../../utils/math.dart';
+import '../constants/settings.dart';
 
 class VisualiserPainter extends CustomPainter {
   const VisualiserPainter({
@@ -14,7 +14,7 @@ class VisualiserPainter extends CustomPainter {
 
   final double padding = 32;
   static const Color backgroundColor =
-      WorldSettings.visualisationBackgroundColor;
+      InfinityRoadSettings.visualisationBackgroundColor;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -23,7 +23,7 @@ class VisualiserPainter extends CustomPainter {
     double width = size.width - padding * 2;
     double height = size.height - padding * 2;
 
-    const borderRadius = WorldSettings.visualisationRadius;
+    const borderRadius = InfinityRoadSettings.visualisationRadius;
     canvas.drawRRect(
       RRect.fromLTRBAndCorners(
         0,

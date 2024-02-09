@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-import 'world.dart';
+import 'infinity_road/infinity_road.dart';
 
 void main() {
   debugRepaintRainbowEnabled = true;
@@ -19,7 +19,7 @@ class MainApp extends StatelessWidget {
       home: Material(
         child: Container(
           color: Colors.grey,
-          child: const World(),
+          child: const InfinityRoad(),
         ),
       ),
     );
