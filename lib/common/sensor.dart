@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../utils/math.dart';
 import 'car.dart';
-import 'position.dart';
+import 'primitives/position.dart';
 
 class Sensor extends CustomPainter {
   Sensor({

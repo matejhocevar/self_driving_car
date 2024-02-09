@@ -2,9 +2,9 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../../common/constants/vehicles.dart';
-import '../../common/controls.dart';
-import '../../common/vehicle.dart';
+import '../common/constants/vehicles.dart';
+import '../common/controls.dart';
+import '../common/vehicle.dart';
 
 class InfinityRoadSettings {
   InfinityRoadSettings._();

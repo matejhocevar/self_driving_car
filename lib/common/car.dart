@@ -2,11 +2,11 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../infinity_road/constants/settings.dart';
+import '../infinity_road/settings.dart';
 import '../network/neural_network.dart';
 import '../utils/math.dart';
 import 'controls.dart';
-import 'position.dart';
+import 'primitives/position.dart';
 import 'sensor.dart';
 import 'vehicle.dart';
 

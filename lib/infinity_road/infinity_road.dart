@@ -6,16 +6,16 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../common/car.dart';
+import '../common/components/toolbar.dart';
 import '../common/constants/vehicles.dart';
 import '../common/controls.dart';
 import '../common/sensor.dart';
 import '../common/vehicle.dart';
 import '../network/neural_network.dart';
 import 'components/progressbar.dart';
-import 'components/toolbar.dart';
 import 'components/visualizer.dart';
-import 'constants/settings.dart';
 import 'road.dart';
+import 'settings.dart';
 
 class InfinityRoad extends StatefulWidget {
   const InfinityRoad({super.key});
@@ -233,6 +233,8 @@ class _InfinityRoadState extends State<InfinityRoad>
           right: InfinityRoadSettings.visualisationMargin,
           child: Toolbar(
             size: InfinityRoadSettings.visualisationToolbarSize,
+            backgroundColor: InfinityRoadSettings.visualisationBackgroundColor,
+            borderRadius: InfinityRoadSettings.visualisationRadius,
             children: [
               const Text(
                 'Cars: ',

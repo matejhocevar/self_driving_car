@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../network/level.dart';
 import '../../network/neural_network.dart';
 import '../../utils/math.dart';
-import '../constants/settings.dart';
+import '../settings.dart';
 
 class VisualiserPainter extends CustomPainter {
   const VisualiserPainter({

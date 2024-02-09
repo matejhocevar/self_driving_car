@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-
-import 'infinity_road/infinity_road.dart';
+import 'package:self_driving_car/virtual_world/virtual_world.dart';
 
 void main() {
   debugRepaintRainbowEnabled = true;
@@ -19,7 +18,7 @@ class MainApp extends StatelessWidget {
       home: Material(
         child: Container(
           color: Colors.grey,
-          child: const InfinityRoad(),
+          child: const VirtualWorld(),
         ),
       ),
     );

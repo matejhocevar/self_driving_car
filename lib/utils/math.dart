@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../common/position.dart';
+import '../common/primitives/position.dart';
 
 double lerp(double a, double b, double t) {
   return a + (b - a) * t;

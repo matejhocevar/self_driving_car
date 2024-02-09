@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 
-import '../constants/settings.dart';
-
 class Toolbar extends StatelessWidget {
   const Toolbar({
     super.key,
-    this.children = const [],
     this.size = const Size(250, 25),
+    this.backgroundColor = Colors.black87,
+    this.borderRadius = const Radius.circular(6),
+    this.children = const [],
   });
 
   final Size size;
+  final Color backgroundColor;
+  final Radius borderRadius;
   final List<Widget> children;
 
   @override
@@ -17,10 +19,9 @@ class Toolbar extends StatelessWidget {
     return Container(
       width: size.width,
       height: size.height,
-      decoration: const BoxDecoration(
-        color: InfinityRoadSettings.visualisationBackgroundColor,
-        borderRadius:
-            BorderRadius.all(InfinityRoadSettings.visualisationRadius),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.all(borderRadius),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Row(

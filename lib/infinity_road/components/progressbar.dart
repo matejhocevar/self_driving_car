@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../utils/math.dart';
-import '../constants/settings.dart';
+import '../settings.dart';
 
 class ProgressBar extends StatelessWidget {
   const ProgressBar({super.key, required this.progress});
