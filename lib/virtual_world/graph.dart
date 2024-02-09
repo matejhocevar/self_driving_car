@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 
 import '../common/primitives/point.dart';
@@ -12,8 +14,8 @@ class Graph extends CustomPainter {
     this.segments = List.from(segments, growable: true);
   }
 
-  late final List<Point> points;
-  late final List<Segment> segments;
+  late List<Point> points;
+  late List<Segment> segments;
 
   bool tryAddPoint(Point p) {
     if (points.contains(p)) {
@@ -61,4 +63,32 @@ class Graph extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) =>
       oldDelegate != this;
+
+  @override
+  String toString() {
+    Map<String, dynamic> json = {
+      'points': points.map((p) => p.toJSON()).toList(),
+      'segments': segments.map((s) => s.toJSON()).toList(),
+    };
+    return jsonEncode(json);
+  }
+
+  static Graph fromString(String str) {
+    final json = jsonDecode(str);
+
+    List<Point> points = (json['points'] as List<dynamic>)
+        .map((p) => Point.fromJSON(List<double>.from(p)))
+        .toList();
+
+    List<Segment> segments = (json['segments'] as List<dynamic>).map((s) {
+      final [p1x, p1y, p2x, p2y] = List<double>.from(s);
+      var p1 = points.firstWhere((Point pp) => pp.x == p1x && pp.y == p1y);
+      var p2 = points.firstWhere((Point pp) => pp.x == p2x && pp.y == p2y);
+      return Segment(p1, p2);
+    }).toList();
+
+    return Graph()
+      ..points = points
+      ..segments = segments;
+  }
 }

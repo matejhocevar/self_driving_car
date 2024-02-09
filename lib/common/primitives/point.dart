@@ -64,4 +64,12 @@ class Point extends CustomPainter {
 
   @override
   int get hashCode => Object.hash(x, y);
+
+  List<double> toJSON() {
+    return [x, y];
+  }
+
+  static Point fromJSON(List<double> json) {
+    return Point(json[0], json[1]);
+  }
 }

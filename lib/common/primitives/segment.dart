@@ -52,4 +52,8 @@ class Segment extends CustomPainter {
 
   @override
   int get hashCode => Object.hash(p1, p2);
+
+  List<double> toJSON() {
+    return [p1.x, p1.y, p2.x, p2.y];
+  }
 }

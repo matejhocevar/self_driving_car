@@ -1,9 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../common/components/toolbar.dart';
-import '../common/primitives/point.dart';
-import '../common/primitives/segment.dart';
 import 'editors/graph_editor.dart';
 import 'graph.dart';
 import 'settings.dart';
@@ -18,27 +17,34 @@ class WorldHost extends StatefulWidget {
 }
 
 class _WorldHostState extends State<WorldHost> {
+  late final SharedPreferences prefs;
+
   late Graph graph;
   late ViewPort viewport;
 
+  bool virtualWorldLoaded = false;
   bool isGraphEditorMode = false;
 
   @override
   void initState() {
     super.initState();
 
-    Point p1 = Point(600, 240);
-    Point p2 = Point(600, 460);
+    SharedPreferences.getInstance().then((p) async {
+      prefs = p;
 
-    Segment s1 = Segment(p1, p2);
+      _generateVirtualWorld();
+    });
+  }
 
-    graph = Graph(
-      points: [p1, p2],
-      segments: [s1],
-    );
+  Future<void> _generateVirtualWorld() async {
+    graph = await _loadGraph() ?? Graph();
     Size size =
         WidgetsBinding.instance.platformDispatcher.views.first.physicalSize;
     viewport = ViewPort(height: size.height, width: size.width);
+
+    setState(() {
+      virtualWorldLoaded = true;
+    });
   }
 
   void _toggleGraphEditor() {
@@ -54,8 +60,34 @@ class _WorldHostState extends State<WorldHost> {
     }
   }
 
+  Future<Graph?> _loadGraph() async {
+    String? graph = prefs.getString('graph');
+    if (graph != null) {
+      return Graph.fromString(graph);
+    }
+
+    return null;
+  }
+
+  Future<void> _handleSaveGraph() async {
+    prefs.setString('graph', graph.toString());
+  }
+
+  void _handleDisposeGraph() {
+    graph.dispose();
+    prefs.remove('graph');
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (!virtualWorldLoaded) {
+      return const Center(
+        child: CircularProgressIndicator(
+          color: VirtualWorldSettings.controlsBackgroundColor,
+        ),
+      );
+    }
+
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -77,7 +109,6 @@ class _WorldHostState extends State<WorldHost> {
               backgroundColor: VirtualWorldSettings.controlsBackgroundColor,
               borderRadius: VirtualWorldSettings.controlsRadius,
               children: [
-                const Spacer(),
                 IconButton(
                   icon: Icon(
                     isGraphEditorMode ? Icons.remove_road : Icons.edit_road,
@@ -88,6 +119,20 @@ class _WorldHostState extends State<WorldHost> {
                   onPressed: _toggleGraphEditor,
                 ),
                 const Spacer(),
+                IconButton(
+                  icon: const Icon(Icons.save),
+                  iconSize: 20,
+                  tooltip: 'Save Graph',
+                  color: Colors.white,
+                  onPressed: _handleSaveGraph,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete_forever),
+                  iconSize: 20,
+                  tooltip: 'Dispose Graph',
+                  color: Colors.white,
+                  onPressed: _handleDisposeGraph,
+                ),
               ],
             ),
           ),
