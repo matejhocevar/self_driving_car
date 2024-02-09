@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 
-class Point extends CustomPainter {
-  const Point(this.x, this.y);
+import '../../virtual_world/settings.dart';
 
-  final double x;
-  final double y;
+class Point extends CustomPainter {
+  Point(this.x, this.y);
+
+  double x;
+  double y;
+
+  Point.fromOffset(Offset o)
+      : x = o.dx,
+        y = o.dy;
 
   Offset get offset => Offset(x, y);
 
@@ -14,8 +20,31 @@ class Point extends CustomPainter {
     Size size, {
     double radius = 18,
     Color color = Colors.black87,
+    bool outline = false,
+    bool fill = false,
   }) {
-    canvas.drawCircle(offset, radius / 2, Paint()..color = color);
+    canvas.drawCircle(
+      offset,
+      radius / 2,
+      Paint()..color = color,
+    );
+
+    if (outline) {
+      canvas.drawCircle(
+        offset,
+        radius / 2 * 0.6,
+        VirtualWorldSettings.graphEditorSelectedPaint
+          ..style = PaintingStyle.stroke,
+      );
+    }
+
+    if (fill) {
+      canvas.drawCircle(
+        offset,
+        radius / 2 * 0.4,
+        VirtualWorldSettings.graphEditorHoveredPaint,
+      );
+    }
   }
 
   @override

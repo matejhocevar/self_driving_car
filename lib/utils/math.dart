@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../common/primitives/point.dart';
 import '../common/primitives/position.dart';
 
 double lerp(double a, double b, double t) {
@@ -29,6 +30,24 @@ Position? getIntersection(Offset a, Offset b, Offset c, Offset d) {
   }
 }
 
+Point? getNearestPoint(
+  Point point,
+  List<Point> points, {
+  double threshold = double.infinity,
+}) {
+  double minDist = double.infinity;
+  Point? nearest;
+
+  for (Point p in points) {
+    double dist = distance(p, point);
+    if (dist < minDist && dist < threshold) {
+      minDist = dist;
+      nearest = p;
+    }
+  }
+  return nearest;
+}
+
 bool polysIntersect(List<Offset> p1, List<Offset> p2) {
   for (int i = 0; i < p1.length; i++) {
     for (int j = 0; j < p2.length; j++) {
@@ -45,6 +64,10 @@ bool polysIntersect(List<Offset> p1, List<Offset> p2) {
   }
 
   return false;
+}
+
+double distance(Point p1, Point p2) {
+  return hypot(p1.x - p2.x, p1.y - p2.y);
 }
 
 double hypot(double x, double y) {
