@@ -24,9 +24,9 @@ class World extends StatefulWidget {
   State<World> createState() => _WorldState();
 }
 
-class _WorldState extends State<World> with SingleTickerProviderStateMixin {
+class _WorldState extends State<World> with TickerProviderStateMixin {
   late final SharedPreferences prefs;
-  late AnimationController _controller;
+  AnimationController? _controller;
 
   bool worldLoaded = false;
 
@@ -62,21 +62,23 @@ class _WorldState extends State<World> with SingleTickerProviderStateMixin {
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 16),
-    )..addListener(() {
-        setState(() {
-          road.update(bestCar!.y);
+    )..addListener(_onUpdateListener);
 
-          cars.forEach((Car c) => c.update(road.borders, traffic));
-          _selectTheBestCar();
-
-          traffic.forEach((Car c) => c.update(road.borders, []));
-        });
-      });
-
-    _controller.repeat();
+    _controller!.repeat();
 
     setState(() {
       worldLoaded = true;
+    });
+  }
+
+  void _onUpdateListener() {
+    setState(() {
+      road.update(bestCar!.y);
+
+      cars.forEach((Car c) => c.update(road.borders, traffic));
+      _selectTheBestCar();
+
+      traffic.forEach((Car c) => c.update(road.borders, []));
     });
   }
 
@@ -162,6 +164,21 @@ class _WorldState extends State<World> with SingleTickerProviderStateMixin {
     print('Models disposed!');
   }
 
+  void _reset() async {
+    setState(() {
+      RawKeyboard.instance.removeListener(cars.first.controls.onKeyEvent);
+      _controller!.removeListener(_onUpdateListener);
+      _controller!.dispose();
+      _controller = null;
+
+      worldLoaded = false;
+      cars = [];
+      traffic = [];
+    });
+
+    _generateWorld();
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!worldLoaded) {
@@ -209,9 +226,20 @@ class _WorldState extends State<World> with SingleTickerProviderStateMixin {
                 'Cars: ',
                 style: TextStyle(color: Colors.white),
               ),
-              Text(
-                '$drivingCars / ${cars.length}',
-                style: const TextStyle(color: Colors.white),
+              Container(
+                width: 70,
+                alignment: Alignment.centerRight,
+                child: Text(
+                  '$drivingCars / ${cars.length}',
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.refresh),
+                iconSize: 20,
+                tooltip: 'Reset',
+                color: Colors.white,
+                onPressed: _reset,
               ),
               const Spacer(),
               IconButton(
@@ -246,7 +274,7 @@ class _WorldState extends State<World> with SingleTickerProviderStateMixin {
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller?.dispose();
     RawKeyboard.instance.removeListener(cars.first.controls.onKeyEvent);
     super.dispose();
   }
