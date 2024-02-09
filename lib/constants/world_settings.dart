@@ -12,7 +12,8 @@ class WorldSettings {
   // Road
   static const Size roadSize = Size(200, double.infinity);
   static const int roadLaneCount = 3;
-  static const double roadInfinity = 10000;
+  static const double roadInfinity = 2500;
+  static const double roadRedrawThreshold = 1500;
 
   // Training car
   static const int trainingCarsN = 500;

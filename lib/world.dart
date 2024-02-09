@@ -57,7 +57,6 @@ class _WorldState extends State<World> with SingleTickerProviderStateMixin {
     );
     cars.addAll(await _generateCars(n: WorldSettings.trainingCarsN));
     traffic.addAll(_generateTraffic());
-
     RawKeyboard.instance.addListener(cars.first.controls.onKeyEvent);
 
     _controller = AnimationController(
@@ -65,6 +64,8 @@ class _WorldState extends State<World> with SingleTickerProviderStateMixin {
       duration: const Duration(milliseconds: 16),
     )..addListener(() {
         setState(() {
+          road.update(bestCar!.y);
+
           cars.forEach((Car c) => c.update(road.borders, traffic));
           _selectTheBestCar();
 

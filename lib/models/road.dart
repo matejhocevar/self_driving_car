@@ -20,18 +20,16 @@ class Road extends CustomPainter {
     ];
   }
 
-  static const double infinity = WorldSettings.roadInfinity;
-
   final double x;
   final double width;
   int laneCount;
 
   late final double left;
   late final double right;
-  late final List<List<Offset>> borders;
+  late List<List<Offset>> borders;
 
-  final double top = -Road.infinity;
-  final double bottom = Road.infinity;
+  double top = -WorldSettings.roadInfinity;
+  double bottom = WorldSettings.roadInfinity;
 
   Road copyWith({
     double? x,
@@ -50,6 +48,18 @@ class Road extends CustomPainter {
     return left +
         laneWidth / 2 +
         math.min(laneIndex, laneCount - 1) * laneWidth;
+  }
+
+  void update(double offsetY) {
+    if ((top - offsetY).abs() < WorldSettings.roadRedrawThreshold) {
+      top += -WorldSettings.roadInfinity;
+      bottom += -WorldSettings.roadInfinity;
+
+      borders = [
+        [Offset(left, top), Offset(left, bottom)],
+        [Offset(right, top), Offset(right, bottom)],
+      ];
+    }
   }
 
   @override

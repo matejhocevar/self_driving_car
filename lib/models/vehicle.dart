@@ -47,12 +47,12 @@ class Vehicle {
 
     this.maxSpeed = maxSpeed ??
         switch (type) {
-          VehicleType.carRace || VehicleType.police => 5,
-          VehicleType.carSport || VehicleType.ambulance => 4,
-          VehicleType.carService || VehicleType.unknown => 3,
-          VehicleType.truck => 2.75,
-          VehicleType.van || VehicleType.limousine => 2.5,
-          VehicleType.firetruck => 2,
+          VehicleType.carRace || VehicleType.police => 3,
+          VehicleType.carSport || VehicleType.ambulance => 2.5,
+          VehicleType.carService || VehicleType.unknown => 2,
+          VehicleType.truck => 1.75,
+          VehicleType.van || VehicleType.limousine => 1.5,
+          VehicleType.firetruck => 1,
         };
   }
 
