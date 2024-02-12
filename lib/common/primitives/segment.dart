@@ -1,6 +1,9 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:self_driving_car/utils/canvas.dart';
 
+import '../../utils/math.dart';
 import 'point.dart';
 
 class Segment extends CustomPainter {
@@ -13,6 +16,36 @@ class Segment extends CustomPainter {
 
   bool includes(Point p) {
     return p1 == p || p2 == p;
+  }
+
+  double length() {
+    return distance(p1, p2);
+  }
+
+  Point directionVector() {
+    return normalize(subtract(p2, p1));
+  }
+
+  double distanceToPoint(Point p) {
+    final (Point projPoint, double projOffset) = projectPoint(p);
+    if (projOffset > 0 && projOffset < 1) {
+      return distance(p, projPoint);
+    }
+
+    double distToP1 = distance(p, p1);
+    double distToP2 = distance(p, p2);
+    return math.min(distToP1, distToP2);
+  }
+
+  (Point point, double offset) projectPoint(Point p) {
+    Point a = subtract(p, p1);
+    Point b = subtract(p2, p1);
+    Point normB = normalize(b);
+    double scaler = dot(a, normB);
+    return (
+      add(p1, scale(normB, scaler)),
+      scaler / magnitude(b),
+    );
   }
 
   @override

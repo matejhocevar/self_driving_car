@@ -14,7 +14,8 @@ Position? getIntersection(Offset a, Offset b, Offset c, Offset d) {
   final uTop = (c.dy - a.dy) * (a.dx - b.dx) - (c.dx - a.dx) * (a.dy - b.dy);
   final bottom = (d.dy - c.dy) * (b.dx - a.dx) - (d.dx - c.dx) * (b.dy - a.dy);
 
-  if (bottom != 0) {
+  const double eps = 0.001;
+  if (bottom.abs() > eps) {
     final t = tTop / bottom;
     final u = uTop / bottom;
 
@@ -74,6 +75,10 @@ Point average(Point p1, Point p2) {
   return Point((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
 }
 
+double dot(Point p1, Point p2) {
+  return p1.x * p2.x + p1.y * p2.y;
+}
+
 double hypot(double x, double y) {
   return math.sqrt(math.pow(x, 2) + math.pow(y, 2));
 }
@@ -88,6 +93,14 @@ Point subtract(Point p1, Point p2) {
 
 Point scale(Point p, double scale) {
   return Point(p.x * scale, p.y * scale);
+}
+
+Point normalize(Point p) {
+  return scale(p, 1 / magnitude(p));
+}
+
+double magnitude(Point p) {
+  return hypot(p.x, p.y);
 }
 
 Point translate(p, angle, offset) {

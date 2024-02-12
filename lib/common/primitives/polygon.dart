@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:self_driving_car/utils/math.dart';
 
@@ -74,6 +76,32 @@ class Polygon extends CustomPainter {
         }
       }
     }
+  }
+
+  double distanceToPoint(Point p) {
+    return segments.map((s) => s.distanceToPoint(p)).reduce(math.min);
+  }
+
+  double distanceToPolygon(Polygon p) {
+    return points.map((point) => p.distanceToPoint(point)).reduce(math.min);
+  }
+
+  bool intersectsPolygon(Polygon p) {
+    for (Segment s1 in segments) {
+      for (Segment s2 in p.segments) {
+        if (getIntersection(
+              s1.p1.offset,
+              s1.p2.offset,
+              s2.p1.offset,
+              s2.p2.offset,
+            ) !=
+            null) {
+          return true;
+        }
+      }
+    }
+
+    return false;
   }
 
   bool containsSegment(Segment s) {

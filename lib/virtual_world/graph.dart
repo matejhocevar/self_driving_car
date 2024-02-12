@@ -64,6 +64,8 @@ class Graph extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) =>
       oldDelegate != this;
 
+  String get hash => toString();
+
   @override
   String toString() {
     Map<String, dynamic> json = {

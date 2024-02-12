@@ -14,6 +14,15 @@ class VirtualWorldSettings {
   static const double roadBorderWidth = 4;
   static const Color roadColor = Color(0xffbbbbbb);
 
+  // Building
+  static const double buildingWidth = 150;
+  static const double buildingMinLength = 150;
+  static const double buildingSpacing = 50;
+
+  // Trees
+  static const double treeSize = 160;
+  static const int treeTryCount = 100;
+
   // Graph Editor
   static Paint graphEditorSelectedPaint = Paint()
     ..color = Colors.yellow

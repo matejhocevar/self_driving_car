@@ -18,21 +18,21 @@ class Point extends CustomPainter {
   void paint(
     Canvas canvas,
     Size size, {
-    double radius = 18,
+    double radius = 9,
     Color color = Colors.black87,
     bool outline = false,
     bool fill = false,
   }) {
     canvas.drawCircle(
       offset,
-      radius / 2,
+      radius,
       Paint()..color = color,
     );
 
     if (outline) {
       canvas.drawCircle(
         offset,
-        radius / 2 * 0.6,
+        radius * 0.6,
         VirtualWorldSettings.graphEditorSelectedPaint
           ..style = PaintingStyle.stroke,
       );
@@ -41,7 +41,7 @@ class Point extends CustomPainter {
     if (fill) {
       canvas.drawCircle(
         offset,
-        radius / 2 * 0.4,
+        radius * 0.4,
         VirtualWorldSettings.graphEditorHoveredPaint,
       );
     }

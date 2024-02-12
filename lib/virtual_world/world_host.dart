@@ -47,6 +47,11 @@ class _WorldHostState extends State<WorldHost> {
       graph: graph,
       roadWidth: VirtualWorldSettings.roadWidth,
       roadRoundness: VirtualWorldSettings.roadRoundness,
+      buildingWidth: VirtualWorldSettings.buildingWidth,
+      buildingMinLength: VirtualWorldSettings.buildingMinLength,
+      spacing: VirtualWorldSettings.buildingSpacing,
+      treeSize: VirtualWorldSettings.treeSize,
+      treeTryCount: VirtualWorldSettings.treeTryCount,
     );
 
     setState(() {
