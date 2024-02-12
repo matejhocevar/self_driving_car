@@ -6,15 +6,16 @@ import '../../utils/math.dart';
 import '../graph.dart';
 import '../settings.dart';
 import '../viewport.dart';
+import '../world.dart';
 
 class GraphEditor extends StatefulWidget {
   const GraphEditor({
     super.key,
-    required this.graph,
+    required this.world,
     required this.viewport,
   });
 
-  final Graph graph;
+  final World world;
   final ViewPort viewport;
 
   @override
@@ -35,7 +36,7 @@ class _GraphEditorState extends State<GraphEditor> {
   void initState() {
     super.initState();
 
-    graph = widget.graph;
+    graph = widget.world.graph;
     viewport = widget.viewport;
   }
 
@@ -143,7 +144,7 @@ class _GraphEditorState extends State<GraphEditor> {
         onSecondaryTapDown: _handleSecondaryTapDown,
         child: CustomPaint(
           painter: GraphEditorPainter(
-            graph: widget.graph,
+            world: widget.world,
             viewport: widget.viewport,
             selected: selected,
             hovered: hovered,
@@ -157,14 +158,14 @@ class _GraphEditorState extends State<GraphEditor> {
 
 class GraphEditorPainter extends CustomPainter {
   const GraphEditorPainter({
-    required this.graph,
+    required this.world,
     required this.viewport,
     this.selected,
     this.hovered,
     this.mouse,
   });
 
-  final Graph graph;
+  final World world;
   final ViewPort viewport;
   final Point? selected;
   final Point? hovered;
@@ -180,7 +181,9 @@ class GraphEditorPainter extends CustomPainter {
     canvas.scale(1 / viewport.zoom, 1 / viewport.zoom);
     Point offset = viewport.getOffset();
     canvas.translate(offset.x, offset.y);
-    graph.paint(canvas, size);
+
+    world.paint(canvas, size);
+    world.graph.paint(canvas, size);
 
     if (selected != null) {
       Point intent = hovered != null ? hovered! : mouse!;

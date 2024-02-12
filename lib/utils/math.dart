@@ -70,6 +70,10 @@ double distance(Point p1, Point p2) {
   return hypot(p1.x - p2.x, p1.y - p2.y);
 }
 
+Point average(Point p1, Point p2) {
+  return Point((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
+}
+
 double hypot(double x, double y) {
   return math.sqrt(math.pow(x, 2) + math.pow(y, 2));
 }
@@ -84,6 +88,17 @@ Point subtract(Point p1, Point p2) {
 
 Point scale(Point p, double scale) {
   return Point(p.x * scale, p.y * scale);
+}
+
+Point translate(p, angle, offset) {
+  return Point(
+    p.x + math.cos(angle) * offset,
+    p.y + math.sin(angle) * offset,
+  );
+}
+
+double angle(Point p) {
+  return math.atan2(p.y, p.x);
 }
 
 extension RGBA on double {

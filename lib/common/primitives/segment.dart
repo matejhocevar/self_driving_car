@@ -4,10 +4,12 @@ import 'package:self_driving_car/utils/canvas.dart';
 import 'point.dart';
 
 class Segment extends CustomPainter {
-  const Segment(this.p1, this.p2);
+  Segment(this.p1, this.p2);
 
-  final Point p1;
-  final Point p2;
+  Point p1;
+  Point p2;
+
+  (Point, Point) get points => (p1, p2);
 
   bool includes(Point p) {
     return p1 == p || p2 == p;

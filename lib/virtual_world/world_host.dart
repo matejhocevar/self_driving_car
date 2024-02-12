@@ -8,6 +8,7 @@ import 'graph.dart';
 import 'settings.dart';
 import 'viewport.dart';
 import 'virtual_world.dart';
+import 'world.dart';
 
 class WorldHost extends StatefulWidget {
   const WorldHost({super.key});
@@ -19,6 +20,7 @@ class WorldHost extends StatefulWidget {
 class _WorldHostState extends State<WorldHost> {
   late final SharedPreferences prefs;
 
+  late World world;
   late Graph graph;
   late ViewPort viewport;
 
@@ -41,6 +43,11 @@ class _WorldHostState extends State<WorldHost> {
     Size size =
         WidgetsBinding.instance.platformDispatcher.views.first.physicalSize;
     viewport = ViewPort(height: size.height, width: size.width);
+    world = World(
+      graph: graph,
+      roadWidth: VirtualWorldSettings.roadWidth,
+      roadRoundness: VirtualWorldSettings.roadRoundness,
+    );
 
     setState(() {
       virtualWorldLoaded = true;
@@ -97,8 +104,8 @@ class _WorldHostState extends State<WorldHost> {
           child: Listener(
             onPointerSignal: _handleScroll,
             child: isGraphEditorMode
-                ? GraphEditor(graph: graph, viewport: viewport)
-                : VirtualWorld(graph: graph, viewport: viewport),
+                ? GraphEditor(world: world, viewport: viewport)
+                : VirtualWorld(world: world, viewport: viewport),
           ),
         ),
         Positioned(

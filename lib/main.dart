@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:self_driving_car/virtual_world/world_host.dart';
+
+import 'virtual_world/world_host.dart';
 
 void main() {
   debugRepaintRainbowEnabled = true;

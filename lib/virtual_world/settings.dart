@@ -6,6 +6,14 @@ class VirtualWorldSettings {
   static const double viewportZoomMin = 1;
   static const double viewportZoomMax = 5;
 
+  // Road
+  static const double roadWidth = 100;
+  static const double roadMargin = 15;
+  static const int roadRoundness = 10;
+  static const List<int> roadLineDash = [10, 10];
+  static const double roadBorderWidth = 4;
+  static const Color roadColor = Color(0xffbbbbbb);
+
   // Graph Editor
   static Paint graphEditorSelectedPaint = Paint()
     ..color = Colors.yellow

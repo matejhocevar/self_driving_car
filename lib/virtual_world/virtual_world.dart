@@ -3,15 +3,16 @@ import 'package:flutter/material.dart';
 import '../common/primitives/point.dart';
 import 'graph.dart';
 import 'viewport.dart';
+import 'world.dart';
 
 class VirtualWorld extends StatefulWidget {
   const VirtualWorld({
     super.key,
-    required this.graph,
+    required this.world,
     required this.viewport,
   });
 
-  final Graph graph;
+  final World world;
   final ViewPort viewport;
 
   @override
@@ -26,7 +27,6 @@ class _VirtualWorldState extends State<VirtualWorld> {
   void initState() {
     super.initState();
 
-    graph = widget.graph;
     viewport = widget.viewport;
   }
 
@@ -54,7 +54,7 @@ class _VirtualWorldState extends State<VirtualWorld> {
       onPanEnd: _handlePanEnd,
       child: CustomPaint(
         painter: VirtualWorldPainter(
-          graph: graph,
+          world: widget.world,
           viewport: viewport,
         ),
       ),
@@ -64,11 +64,11 @@ class _VirtualWorldState extends State<VirtualWorld> {
 
 class VirtualWorldPainter extends CustomPainter {
   const VirtualWorldPainter({
-    required this.graph,
+    required this.world,
     required this.viewport,
   });
 
-  final Graph graph;
+  final World world;
   final ViewPort viewport;
 
   @override
@@ -81,7 +81,7 @@ class VirtualWorldPainter extends CustomPainter {
     canvas.scale(1 / viewport.zoom, 1 / viewport.zoom);
     Point offset = viewport.getOffset();
     canvas.translate(offset.x, offset.y);
-    graph.paint(canvas, size);
+    world.paint(canvas, size);
 
     canvas.restore();
   }
