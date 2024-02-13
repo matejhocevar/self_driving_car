@@ -42,7 +42,7 @@ class VirtualWorldSettings {
   static const double graphEditorSelectedThreshold = 16;
 
   // Controls
-  static const Size controlsSize = Size(450, 36);
+  static const Size controlsSize = Size(480, 36);
   static const Color controlsBackgroundColor = Colors.black87;
   static const double controlsMargin = 16;
   static const Radius controlsRadius = Radius.circular(6);

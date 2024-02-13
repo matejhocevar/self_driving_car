@@ -10,6 +10,7 @@ import 'editors/graph_editor.dart';
 import 'editors/parking_editor.dart';
 import 'editors/start_editor.dart';
 import 'editors/stop_editor.dart';
+import 'editors/target_editor.dart';
 import 'editors/yield_editor.dart';
 import 'graph.dart';
 import 'settings.dart';
@@ -22,10 +23,11 @@ enum WorldMode {
   preview,
   roadEditor,
   crossingEditor,
-  stopEditor,
-  startEditor,
-  yieldEditor,
   parkingEditor,
+  stopEditor,
+  yieldEditor,
+  startEditor,
+  targetEditor,
 }
 
 class WorldHost extends StatefulWidget {
@@ -134,6 +136,11 @@ class _WorldHostState extends State<WorldHost> {
           vehicle: vehicles.firstWhere((v) => v.name == 'car_sport_red'),
           targetSegments: world.laneGuides,
         ),
+      WorldMode.targetEditor => TargetEditor(
+          world: world,
+          viewport: viewport,
+          targetSegments: world.laneGuides,
+        ),
       WorldMode.yieldEditor => YieldEditor(
           world: world,
           viewport: viewport,
@@ -215,6 +222,12 @@ class _WorldHostState extends State<WorldHost> {
                   tooltip: 'Start/Spawn editor',
                   isActive: _worldMode == WorldMode.startEditor,
                   onTap: () => _setWorldMode(WorldMode.startEditor),
+                ),
+                ToolbarIcon(
+                  icon: Icons.adjust,
+                  tooltip: 'Target editor',
+                  isActive: _worldMode == WorldMode.targetEditor,
+                  onTap: () => _setWorldMode(WorldMode.targetEditor),
                 ),
                 const Spacer(),
                 ToolbarIcon(
