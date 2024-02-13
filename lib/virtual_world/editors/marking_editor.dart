@@ -16,13 +16,11 @@ abstract class MarkingEditor extends StatefulWidget {
     Key? key,
     required this.world,
     required this.viewport,
-    required this.markingType,
     required this.targetSegments,
   }) : super(key: key);
 
   final World world;
   final ViewPort viewport;
-  final Type markingType;
   final List<Segment> targetSegments;
 
   @override

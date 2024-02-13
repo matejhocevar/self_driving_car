@@ -4,8 +4,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../common/components/toolbar.dart';
 import '../common/components/toolbar_icon.dart';
+import '../common/constants/vehicles.dart';
 import 'editors/crossing_editor.dart';
 import 'editors/graph_editor.dart';
+import 'editors/start_editor.dart';
 import 'editors/stop_editor.dart';
 import 'graph.dart';
 import 'settings.dart';
@@ -19,6 +21,7 @@ enum WorldMode {
   roadEditor,
   stopEditor,
   crossingEditor,
+  startEditor,
 }
 
 class WorldHost extends StatefulWidget {
@@ -50,6 +53,8 @@ class _WorldHostState extends State<WorldHost> {
   }
 
   Future<void> _generateVirtualWorld() async {
+    await loadAssets();
+
     graph = await _loadGraph() ?? Graph();
     Size size =
         WidgetsBinding.instance.platformDispatcher.views.first.physicalSize;
@@ -119,6 +124,12 @@ class _WorldHostState extends State<WorldHost> {
           viewport: viewport,
           targetSegments: world.laneGuides,
         ),
+      WorldMode.startEditor => StartEditor(
+          world: world,
+          viewport: viewport,
+          vehicle: vehicles.firstWhere((v) => v.name == 'car_sport_red'),
+          targetSegments: world.laneGuides,
+        ),
       WorldMode.crossingEditor => CrossingEditor(
           world: world,
           viewport: viewport,
@@ -172,6 +183,12 @@ class _WorldHostState extends State<WorldHost> {
                   tooltip: 'Crossing editor',
                   isActive: _worldMode == WorldMode.crossingEditor,
                   onTap: () => _setWorldMode(WorldMode.crossingEditor),
+                ),
+                ToolbarIcon(
+                  icon: Icons.directions_car,
+                  tooltip: 'Start/Spawn editor',
+                  isActive: _worldMode == WorldMode.startEditor,
+                  onTap: () => _setWorldMode(WorldMode.startEditor),
                 ),
                 const Spacer(),
                 ToolbarIcon(

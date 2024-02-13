@@ -18,7 +18,6 @@ class CrossingEditor extends MarkingEditor {
           key: key,
           world: world,
           viewport: viewport,
-          markingType: Crossing,
           targetSegments: targetSegments,
         );
 
