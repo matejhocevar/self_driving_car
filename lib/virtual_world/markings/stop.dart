@@ -2,37 +2,22 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../../common/primitives/envelope.dart';
 import '../../common/primitives/point.dart';
-import '../../common/primitives/polygon.dart';
 import '../../common/primitives/segment.dart';
 import '../../utils/math.dart';
 import 'marking.dart';
 
-class Stop implements Marking {
+class Stop extends Marking {
   Stop(
-    this.center,
-    this.directionVector, {
-    this.width = 20,
-    this.height = 10,
-  }) {
-    support = Segment(
-      translate(center, angle(directionVector), height / 2),
-      translate(center, angle(directionVector), -height / 2),
-    );
-    polygon = Envelope(support, width: width).polygon;
+    Point center,
+    Point directionVector, {
+    double width = 20,
+    double height = 10,
+  }) : super(center, directionVector, width: width, height: height) {
     border = polygon.segments[2];
   }
 
-  final Point center;
-  final Point directionVector;
-  final double width;
-  final double height;
-
-  late Segment support;
   late Segment border;
-  @override
-  late Polygon polygon;
 
   @override
   void paint(Canvas canvas, Size size) {
