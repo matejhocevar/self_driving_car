@@ -114,10 +114,15 @@ class _WorldHostState extends State<WorldHost> {
 
     Widget worldModeWidget = switch (_worldMode) {
       WorldMode.roadEditor => GraphEditor(world: world, viewport: viewport),
-      WorldMode.stopEditor => StopEditor(world: world, viewport: viewport),
+      WorldMode.stopEditor => StopEditor(
+          world: world,
+          viewport: viewport,
+          targetSegments: world.laneGuides,
+        ),
       WorldMode.crossingEditor => CrossingEditor(
           world: world,
           viewport: viewport,
+          targetSegments: world.graph.segments,
         ),
       WorldMode.preview || WorldMode.unknown => VirtualWorld(
           world: world,
