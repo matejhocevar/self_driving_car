@@ -9,6 +9,8 @@ import '../common/primitives/segment.dart';
 import '../utils/math.dart';
 import 'graph.dart';
 import 'settings.dart';
+import 'street_furniture/building.dart';
+import 'street_furniture/street_furniture.dart';
 import 'street_furniture/tree.dart';
 import 'viewport.dart';
 
@@ -42,7 +44,7 @@ class World extends CustomPainter {
   List<Envelope> envelopes = List.empty(growable: true);
   List<Segment> roadBorders = List.empty(growable: true);
 
-  List<Polygon> buildings = List.empty(growable: true);
+  List<Building> buildings = List.empty(growable: true);
   List<Tree> trees = List.empty(growable: true);
 
   void generate() {
@@ -57,7 +59,7 @@ class World extends CustomPainter {
     trees = _generateTrees();
   }
 
-  List<Polygon> _generateBuildings() {
+  List<Building> _generateBuildings() {
     List<Envelope> tmpEnvelopes = [];
     for (Segment s in graph.segments) {
       tmpEnvelopes.add(
@@ -117,7 +119,14 @@ class World extends CustomPainter {
       }
     }
 
-    return bases;
+    return bases
+        .map(
+          (b) => Building(
+            b,
+            heightCoef: VirtualWorldSettings.buildingHeightCoef,
+          ),
+        )
+        .toList();
   }
 
   List<Tree> _generateTrees() {
@@ -125,7 +134,7 @@ class World extends CustomPainter {
 
     final points = [
       ...roadBorders.map((s) => [s.p1, s.p2]).expand((e) => e).toList(),
-      ...buildings.map((b) => b.points).expand((e) => e).toList(),
+      ...buildings.map((b) => b.base.points).expand((e) => e).toList(),
     ];
 
     if (points.isNotEmpty) {
@@ -135,7 +144,7 @@ class World extends CustomPainter {
       final bottom = points.map((p) => p.y).reduce(math.max);
 
       List<Polygon> illegalPolygons = [
-        ...buildings,
+        ...buildings.map((b) => b.base),
         ...envelopes.map((e) => e.polygon),
       ];
 
@@ -204,6 +213,8 @@ class World extends CustomPainter {
       graphHash = graph.hash;
     }
 
+    final viewPoint = scale(viewport.getOffset(), -1);
+
     // Road envelope
     for (Envelope e in envelopes) {
       e.paint(
@@ -234,19 +245,14 @@ class World extends CustomPainter {
       );
     }
 
-    // Buildings
-    for (Polygon b in buildings) {
-      b.paint(
-        canvas,
-        size,
-        fill: Colors.blue.withOpacity(0.3),
-        stroke: Colors.blue,
-      );
-    }
+    List<StreetFurniture> streetFurniture = [...buildings, ...trees];
+    streetFurniture.sort((a, b) => b.base
+        .distanceToPoint(viewPoint)
+        .compareTo(a.base.distanceToPoint(viewPoint)));
 
-    // Trees
-    for (Tree t in trees) {
-      t.paint(canvas, size, viewPoint: scale(viewport.getOffset(), -1));
+    // Buildings & Trees
+    for (StreetFurniture sf in streetFurniture) {
+      sf.paint(canvas, size, viewPoint: viewPoint);
     }
   }
 

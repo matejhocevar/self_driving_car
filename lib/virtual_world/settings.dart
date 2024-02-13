@@ -18,6 +18,7 @@ class VirtualWorldSettings {
   static const double buildingWidth = 150;
   static const double buildingMinLength = 150;
   static const double buildingSpacing = 50;
+  static const double buildingHeightCoef = 0.3;
 
   // Trees
   static const double treeSize = 160;

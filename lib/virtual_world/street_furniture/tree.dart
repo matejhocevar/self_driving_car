@@ -5,8 +5,9 @@ import 'package:flutter/material.dart';
 import '../../common/primitives/point.dart';
 import '../../common/primitives/polygon.dart';
 import '../../utils/math.dart';
+import 'street_furniture.dart';
 
-class Tree extends CustomPainter {
+class Tree extends CustomPainter implements StreetFurniture {
   const Tree(
     this.center,
     this.radius, {
@@ -19,6 +20,7 @@ class Tree extends CustomPainter {
   final double heightCoef;
   final int layers;
 
+  @override
   Polygon get base => _generateLevel(center, radius);
 
   Polygon _generateLevel(Point point, double radius) {
@@ -38,7 +40,8 @@ class Tree extends CustomPainter {
     Size size, {
     Point? viewPoint,
   }) {
-    Point diff = subtract(center, viewPoint ?? Point(0, 0));
+    viewPoint ??= Point(0, 0);
+    Point diff = subtract(center, viewPoint);
     Point top = add(center, scale(diff, heightCoef));
 
     for (int level = 0; level < layers; level++) {
@@ -54,5 +57,8 @@ class Tree extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant Tree oldDelegate) =>
-      center != oldDelegate.center || radius != oldDelegate.radius;
+      center != oldDelegate.center ||
+      radius != oldDelegate.radius ||
+      layers != oldDelegate.layers ||
+      heightCoef != oldDelegate.heightCoef;
 }
