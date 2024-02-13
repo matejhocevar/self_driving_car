@@ -56,10 +56,12 @@ class Segment extends CustomPainter {
     Color color = Colors.black87,
     List<int> dash = const [],
     bool showPartialDash = false,
+    StrokeCap strokeCap = StrokeCap.square,
   }) {
     Paint paint = Paint()
       ..color = color
-      ..strokeWidth = width;
+      ..strokeWidth = width
+      ..strokeCap = strokeCap;
 
     if (dash.isNotEmpty) {
       final [int dashSpace, int dashWidth] = dash;

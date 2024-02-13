@@ -41,8 +41,13 @@ class VirtualWorldSettings {
     ..style = PaintingStyle.fill;
   static const double graphEditorSelectedThreshold = 16;
 
+  // Traffic lights
+  static const int trafficLightsGreenDuration = 2;
+  static const int trafficLightsYellowDuration = 1;
+  static const int trafficLightsRedDuration = 1;
+
   // Controls
-  static const Size controlsSize = Size(480, 36);
+  static const Size controlsSize = Size(500, 36);
   static const Color controlsBackgroundColor = Colors.black87;
   static const double controlsMargin = 16;
   static const Radius controlsRadius = Radius.circular(6);

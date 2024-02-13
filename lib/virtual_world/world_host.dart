@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,6 +13,7 @@ import 'editors/parking_editor.dart';
 import 'editors/start_editor.dart';
 import 'editors/stop_editor.dart';
 import 'editors/target_editor.dart';
+import 'editors/traffic_light_editor.dart';
 import 'editors/yield_editor.dart';
 import 'graph.dart';
 import 'settings.dart';
@@ -23,6 +26,7 @@ enum WorldMode {
   preview,
   roadEditor,
   crossingEditor,
+  trafficLightEditor,
   parkingEditor,
   stopEditor,
   yieldEditor,
@@ -47,6 +51,8 @@ class _WorldHostState extends State<WorldHost> {
   bool virtualWorldLoaded = false;
   WorldMode _worldMode = WorldMode.preview;
 
+  Timer? timer;
+
   @override
   void initState() {
     super.initState();
@@ -54,7 +60,11 @@ class _WorldHostState extends State<WorldHost> {
     SharedPreferences.getInstance().then((p) async {
       prefs = p;
 
-      _generateVirtualWorld();
+      await _generateVirtualWorld();
+
+      timer?.cancel();
+      timer = Timer.periodic(const Duration(seconds: 1),
+          (Timer timer) => _onUpdateListener(timer.tick));
     });
   }
 
@@ -86,6 +96,11 @@ class _WorldHostState extends State<WorldHost> {
     setState(() {
       _worldMode = mode;
     });
+  }
+
+  void _onUpdateListener(int tick) {
+    world.updateLights(tick);
+    setState(() {});
   }
 
   void _handleScroll(event) {
@@ -151,6 +166,11 @@ class _WorldHostState extends State<WorldHost> {
           viewport: viewport,
           targetSegments: world.graph.segments,
         ),
+      WorldMode.trafficLightEditor => TrafficLightEditor(
+          world: world,
+          viewport: viewport,
+          targetSegments: world.laneGuides,
+        ),
       WorldMode.parkingEditor => ParkingEditor(
           world: world,
           viewport: viewport,
@@ -206,6 +226,12 @@ class _WorldHostState extends State<WorldHost> {
                   onTap: () => _setWorldMode(WorldMode.yieldEditor),
                 ),
                 ToolbarIcon(
+                  icon: Icons.traffic,
+                  tooltip: 'Traffic light editor',
+                  isActive: _worldMode == WorldMode.trafficLightEditor,
+                  onTap: () => _setWorldMode(WorldMode.trafficLightEditor),
+                ),
+                ToolbarIcon(
                   icon: Icons.directions_walk,
                   tooltip: 'Crossing editor',
                   isActive: _worldMode == WorldMode.crossingEditor,
@@ -246,5 +272,11 @@ class _WorldHostState extends State<WorldHost> {
         ),
       ],
     );
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
   }
 }

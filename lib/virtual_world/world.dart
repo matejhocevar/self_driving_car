@@ -1,14 +1,17 @@
 import 'dart:math' as math;
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 import '../common/primitives/envelope.dart';
 import '../common/primitives/point.dart';
 import '../common/primitives/polygon.dart';
 import '../common/primitives/segment.dart';
+import '../common/traffic_light_system.dart';
 import '../utils/math.dart';
 import 'graph.dart';
 import 'markings/marking.dart';
+import 'markings/traffic_light.dart';
 import 'settings.dart';
 import 'street_furniture/building.dart';
 import 'street_furniture/street_furniture.dart';
@@ -234,6 +237,81 @@ class World extends CustomPainter {
     }
 
     return Polygon.union(tmpEnvelopes.map((e) => e.polygon).toList());
+  }
+
+  void updateLights(int tick) {
+    List<TrafficLight> lights = markings.whereType<TrafficLight>().toList();
+
+    // Group traffic lights by nearby system
+    List<TrafficLightSystem> trafficLightSystems = [];
+    for (TrafficLight light in lights) {
+      Point? point = getNearestPoint(light.center, getIntersections());
+
+      if (point != null) {
+        TrafficLightSystem? system =
+            trafficLightSystems.firstWhereOrNull((s) => s.center == point);
+        if (system == null) {
+          system = TrafficLightSystem(
+            point,
+            lights: [light],
+            greenDuration: VirtualWorldSettings.trafficLightsGreenDuration,
+            yellowDuration: VirtualWorldSettings.trafficLightsYellowDuration,
+            redDuration: VirtualWorldSettings.trafficLightsRedDuration,
+          );
+          trafficLightSystems.add(system);
+        } else {
+          system.lights.add(light);
+        }
+      }
+    }
+
+    for (TrafficLightSystem s in trafficLightSystems) {
+      // If system is not working display blinking yellow lights
+      if (s.lightsNotWorking) {
+        for (TrafficLight light in s.lights) {
+          light.state = light.state == TrafficLightState.yellow
+              ? TrafficLightState.off
+              : TrafficLightState.yellow;
+        }
+        continue;
+      }
+
+      // Determinate current state
+      int systemTick = tick % s.ticks;
+      int greenYellowIndex = systemTick ~/ (s.greenDuration + s.yellowDuration);
+      TrafficLightState greenAndYellowState =
+          systemTick % (s.greenDuration + s.yellowDuration) < s.greenDuration
+              ? TrafficLightState.green
+              : TrafficLightState.yellow;
+
+      // Assign states to all lights in the system
+      for (int i = 0; i < s.lights.length; i++) {
+        if (i == greenYellowIndex) {
+          s.lights[i].state = greenAndYellowState;
+        } else {
+          s.lights[i].state = TrafficLightState.red;
+        }
+      }
+    }
+  }
+
+  List<Point> getIntersections() {
+    List<Point> intersections = [];
+
+    for (Point p in graph.points) {
+      int degree = 0;
+      for (Segment s in graph.segments) {
+        if (s.includes(p)) {
+          degree++;
+        }
+      }
+
+      if (degree > 2) {
+        intersections.add(p);
+      }
+    }
+
+    return intersections;
   }
 
   @override
