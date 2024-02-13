@@ -55,6 +55,7 @@ class Segment extends CustomPainter {
     double width = 2,
     Color color = Colors.black87,
     List<int> dash = const [],
+    bool showPartialDash = false,
   }) {
     Paint paint = Paint()
       ..color = color
@@ -69,6 +70,7 @@ class Segment extends CustomPainter {
         paint,
         dashSpace: dashSpace,
         dashWidth: dashWidth,
+        showPartialLines: showPartialDash,
       );
     } else {
       canvas.drawLine(p1.offset, p2.offset, paint);

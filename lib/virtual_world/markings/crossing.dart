@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 
 import '../../common/primitives/envelope.dart';
@@ -9,8 +7,8 @@ import '../../common/primitives/segment.dart';
 import '../../utils/math.dart';
 import 'marking.dart';
 
-class Stop implements Marking {
-  Stop(
+class Crossing implements Marking {
+  Crossing(
     this.center,
     this.directionVector, {
     this.width = 20,
@@ -21,7 +19,7 @@ class Stop implements Marking {
       translate(center, angle(directionVector), -height / 2),
     );
     polygon = Envelope(support, width: width).polygon;
-    border = polygon.segments[2];
+    borders = [polygon.segments[0], polygon.segments[2]];
   }
 
   final Point center;
@@ -30,37 +28,30 @@ class Stop implements Marking {
   final double height;
 
   late Segment support;
-  late Segment border;
+  late List<Segment> borders;
   @override
   late Polygon polygon;
 
   @override
   void paint(Canvas canvas, Size size) {
-    border.paint(canvas, size, width: 5, color: Colors.white);
+    Point perp = perpendicular(directionVector);
+    Segment line = Segment(
+      add(center, scale(perp, width / 2)),
+      add(center, scale(perp, -width / 2)),
+    );
 
-    canvas.save();
-
-    canvas.translate(center.x, center.y);
-    canvas.rotate(angle(directionVector) - math.pi / 2);
-    canvas.scale(1, 3);
-    final TextPainter textPainter = TextPainter(
-        text: TextSpan(
-          text: "STOP",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: height * 0.25,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        textDirection: TextDirection.ltr)
-      ..layout(maxWidth: 62);
-    textPainter.paint(canvas, const Offset(-16, -7));
-
-    canvas.restore();
+    line.paint(
+      canvas,
+      size,
+      width: height,
+      color: Colors.white,
+      dash: [11, 11],
+      showPartialDash: true,
+    );
   }
 
   @override
-  bool shouldRepaint(covariant Stop oldDelegate) =>
+  bool shouldRepaint(covariant Crossing oldDelegate) =>
       center != oldDelegate.center ||
       directionVector != oldDelegate.directionVector ||
       width != oldDelegate.width ||

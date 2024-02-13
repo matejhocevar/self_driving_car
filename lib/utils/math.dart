@@ -129,6 +129,10 @@ double magnitude(Point p) {
   return hypot(p.x, p.y);
 }
 
+Point perpendicular(Point p) {
+  return Point(-p.y, p.x);
+}
+
 Point translate(p, angle, offset) {
   return Point(
     p.x + math.cos(angle) * offset,

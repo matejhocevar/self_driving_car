@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../common/components/toolbar.dart';
 import '../common/components/toolbar_icon.dart';
+import 'editors/crossing_editor.dart';
 import 'editors/graph_editor.dart';
 import 'editors/stop_editor.dart';
 import 'graph.dart';
@@ -17,6 +18,7 @@ enum WorldMode {
   preview,
   roadEditor,
   stopEditor,
+  crossingEditor,
 }
 
 class WorldHost extends StatefulWidget {
@@ -113,7 +115,14 @@ class _WorldHostState extends State<WorldHost> {
     Widget worldModeWidget = switch (_worldMode) {
       WorldMode.roadEditor => GraphEditor(world: world, viewport: viewport),
       WorldMode.stopEditor => StopEditor(world: world, viewport: viewport),
-      _ => VirtualWorld(world: world, viewport: viewport),
+      WorldMode.crossingEditor => CrossingEditor(
+          world: world,
+          viewport: viewport,
+        ),
+      WorldMode.preview || WorldMode.unknown => VirtualWorld(
+          world: world,
+          viewport: viewport,
+        ),
     };
 
     return Stack(
@@ -152,6 +161,12 @@ class _WorldHostState extends State<WorldHost> {
                   tooltip: 'Stop editor',
                   isActive: _worldMode == WorldMode.stopEditor,
                   onTap: () => _setWorldMode(WorldMode.stopEditor),
+                ),
+                ToolbarIcon(
+                  icon: Icons.directions_walk,
+                  tooltip: 'Crossing editor',
+                  isActive: _worldMode == WorldMode.crossingEditor,
+                  onTap: () => _setWorldMode(WorldMode.crossingEditor),
                 ),
                 const Spacer(),
                 ToolbarIcon(

@@ -6,14 +6,14 @@ import '../../common/primitives/polygon.dart';
 import '../../common/primitives/segment.dart';
 import '../../utils/math.dart';
 import '../graph.dart';
+import '../markings/crossing.dart';
 import '../markings/marking.dart';
-import '../markings/stop.dart';
 import '../settings.dart';
 import '../viewport.dart';
 import '../world.dart';
 
-class StopEditor extends StatefulWidget {
-  const StopEditor({
+class CrossingEditor extends StatefulWidget {
+  const CrossingEditor({
     super.key,
     required this.world,
     required this.viewport,
@@ -23,16 +23,16 @@ class StopEditor extends StatefulWidget {
   final ViewPort viewport;
 
   @override
-  State<StopEditor> createState() => _StopEditorState();
+  State<CrossingEditor> createState() => _CrossingEditorState();
 }
 
-class _StopEditorState extends State<StopEditor> {
+class _CrossingEditorState extends State<CrossingEditor> {
   late Graph graph;
   late ViewPort viewport;
   late List<Marking> markings;
 
   Point? mouse;
-  Stop? intent;
+  Crossing? intent;
 
   bool isDragging = false;
 
@@ -52,7 +52,7 @@ class _StopEditorState extends State<StopEditor> {
     );
     Segment? segment = getNearestSegment(
       mouse!,
-      widget.world.laneGuides,
+      widget.world.graph.segments,
       threshold:
           VirtualWorldSettings.graphEditorSelectedThreshold * viewport.zoom,
     );
@@ -60,10 +60,10 @@ class _StopEditorState extends State<StopEditor> {
     if (segment != null) {
       final (projPoint, offset) = segment.projectPoint(mouse!);
       if (offset >= 0 && offset <= 1) {
-        intent = Stop(
+        intent = Crossing(
           projPoint,
           segment.directionVector(),
-          width: widget.world.roadWidth / 2,
+          width: widget.world.roadWidth,
           height: widget.world.roadWidth / 2,
         );
       } else {
@@ -102,7 +102,7 @@ class _StopEditorState extends State<StopEditor> {
         onTapDown: _handleTapDown,
         onSecondaryTapDown: _handleSecondaryTapDown,
         child: CustomPaint(
-          painter: StopEditorPainter(
+          painter: CrossingEditorPainter(
             world: widget.world,
             viewport: widget.viewport,
             mouse: mouse,
@@ -114,8 +114,8 @@ class _StopEditorState extends State<StopEditor> {
   }
 }
 
-class StopEditorPainter extends CustomPainter {
-  const StopEditorPainter({
+class CrossingEditorPainter extends CustomPainter {
+  const CrossingEditorPainter({
     required this.world,
     required this.viewport,
     this.mouse,
@@ -125,12 +125,10 @@ class StopEditorPainter extends CustomPainter {
   final World world;
   final ViewPort viewport;
   final Point? mouse;
-  final Stop? intent;
+  final Crossing? intent;
 
   @override
   void paint(Canvas canvas, Size size) {
-    canvas.drawPaint(Paint()..color = Colors.green);
-
     canvas.save();
 
     canvas.translate(viewport.center.x, viewport.center.y);
@@ -143,9 +141,11 @@ class StopEditorPainter extends CustomPainter {
 
     intent?.paint(canvas, size);
 
+    intent?.paint(canvas, size);
+
     canvas.restore();
   }
 
   @override
-  bool shouldRepaint(covariant StopEditorPainter oldDelegate) => true;
+  bool shouldRepaint(covariant CrossingEditorPainter oldDelegate) => true;
 }
