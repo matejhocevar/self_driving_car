@@ -9,6 +9,7 @@ import 'editors/crossing_editor.dart';
 import 'editors/graph_editor.dart';
 import 'editors/start_editor.dart';
 import 'editors/stop_editor.dart';
+import 'editors/yield_editor.dart';
 import 'graph.dart';
 import 'settings.dart';
 import 'viewport.dart';
@@ -19,9 +20,10 @@ enum WorldMode {
   unknown,
   preview,
   roadEditor,
-  stopEditor,
   crossingEditor,
+  stopEditor,
   startEditor,
+  yieldEditor,
 }
 
 class WorldHost extends StatefulWidget {
@@ -130,6 +132,11 @@ class _WorldHostState extends State<WorldHost> {
           vehicle: vehicles.firstWhere((v) => v.name == 'car_sport_red'),
           targetSegments: world.laneGuides,
         ),
+      WorldMode.yieldEditor => YieldEditor(
+          world: world,
+          viewport: viewport,
+          targetSegments: world.laneGuides,
+        ),
       WorldMode.crossingEditor => CrossingEditor(
           world: world,
           viewport: viewport,
@@ -177,6 +184,12 @@ class _WorldHostState extends State<WorldHost> {
                   tooltip: 'Stop editor',
                   isActive: _worldMode == WorldMode.stopEditor,
                   onTap: () => _setWorldMode(WorldMode.stopEditor),
+                ),
+                ToolbarIcon(
+                  icon: Icons.merge,
+                  tooltip: 'Yield editor',
+                  isActive: _worldMode == WorldMode.yieldEditor,
+                  onTap: () => _setWorldMode(WorldMode.yieldEditor),
                 ),
                 ToolbarIcon(
                   icon: Icons.directions_walk,
