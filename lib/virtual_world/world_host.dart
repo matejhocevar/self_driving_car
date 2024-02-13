@@ -7,6 +7,7 @@ import '../common/components/toolbar_icon.dart';
 import '../common/constants/vehicles.dart';
 import 'editors/crossing_editor.dart';
 import 'editors/graph_editor.dart';
+import 'editors/parking_editor.dart';
 import 'editors/start_editor.dart';
 import 'editors/stop_editor.dart';
 import 'editors/yield_editor.dart';
@@ -24,6 +25,7 @@ enum WorldMode {
   stopEditor,
   startEditor,
   yieldEditor,
+  parkingEditor,
 }
 
 class WorldHost extends StatefulWidget {
@@ -142,6 +144,11 @@ class _WorldHostState extends State<WorldHost> {
           viewport: viewport,
           targetSegments: world.graph.segments,
         ),
+      WorldMode.parkingEditor => ParkingEditor(
+          world: world,
+          viewport: viewport,
+          targetSegments: world.laneGuides,
+        ),
       WorldMode.preview || WorldMode.unknown => VirtualWorld(
           world: world,
           viewport: viewport,
@@ -196,6 +203,12 @@ class _WorldHostState extends State<WorldHost> {
                   tooltip: 'Crossing editor',
                   isActive: _worldMode == WorldMode.crossingEditor,
                   onTap: () => _setWorldMode(WorldMode.crossingEditor),
+                ),
+                ToolbarIcon(
+                  icon: Icons.local_parking,
+                  tooltip: 'Parking editor',
+                  isActive: _worldMode == WorldMode.parkingEditor,
+                  onTap: () => _setWorldMode(WorldMode.parkingEditor),
                 ),
                 ToolbarIcon(
                   icon: Icons.directions_car,
