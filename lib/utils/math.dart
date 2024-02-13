@@ -9,6 +9,13 @@ double lerp(double a, double b, double t) {
   return a + (b - a) * t;
 }
 
+Point lerp2D(Point a, Point b, double t) {
+  return Point(
+    lerp(a.x, b.x, t),
+    lerp(a.y, b.y, t),
+  );
+}
+
 Position? getIntersection(Offset a, Offset b, Offset c, Offset d) {
   final tTop = (d.dx - c.dx) * (a.dy - c.dy) - (d.dy - c.dy) * (a.dx - c.dx);
   final uTop = (c.dy - a.dy) * (a.dx - b.dx) - (c.dx - a.dx) * (a.dy - b.dy);

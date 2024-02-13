@@ -45,6 +45,7 @@ class _WorldHostState extends State<WorldHost> {
     viewport = ViewPort(height: size.height, width: size.width);
     world = World(
       graph: graph,
+      viewport: viewport,
       roadWidth: VirtualWorldSettings.roadWidth,
       roadRoundness: VirtualWorldSettings.roadRoundness,
       buildingWidth: VirtualWorldSettings.buildingWidth,

@@ -22,6 +22,8 @@ class VirtualWorldSettings {
   // Trees
   static const double treeSize = 160;
   static const int treeTryCount = 100;
+  static const double treeHeightCoef = 0.3;
+  static const int treeLayers = 7;
 
   // Graph Editor
   static Paint graphEditorSelectedPaint = Paint()

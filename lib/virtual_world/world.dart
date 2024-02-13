@@ -9,10 +9,13 @@ import '../common/primitives/segment.dart';
 import '../utils/math.dart';
 import 'graph.dart';
 import 'settings.dart';
+import 'street_furniture/tree.dart';
+import 'viewport.dart';
 
 class World extends CustomPainter {
   World({
     required this.graph,
+    required this.viewport,
     this.roadWidth = 100,
     this.roadRoundness = 3,
     this.buildingWidth = 150,
@@ -25,6 +28,7 @@ class World extends CustomPainter {
   }
 
   final Graph graph;
+  final ViewPort viewport;
   String? graphHash;
   final double roadWidth;
   final int roadRoundness;
@@ -39,7 +43,7 @@ class World extends CustomPainter {
   List<Segment> roadBorders = List.empty(growable: true);
 
   List<Polygon> buildings = List.empty(growable: true);
-  List<Point> trees = List.empty(growable: true);
+  List<Tree> trees = List.empty(growable: true);
 
   void generate() {
     envelopes.length = 0;
@@ -116,8 +120,8 @@ class World extends CustomPainter {
     return bases;
   }
 
-  List<Point> _generateTrees() {
-    List<Point> trees = [];
+  List<Tree> _generateTrees() {
+    List<Tree> trees = [];
 
     final points = [
       ...roadBorders.map((s) => [s.p1, s.p2]).expand((e) => e).toList(),
@@ -155,7 +159,7 @@ class World extends CustomPainter {
         // Check if it overlap existing trees
         if (keep) {
           for (var tree in trees) {
-            if (distance(tree, p) < treeSize) {
+            if (distance(tree.center, p) < treeSize) {
               keep = false;
               break;
             }
@@ -175,7 +179,14 @@ class World extends CustomPainter {
         }
 
         if (keep) {
-          trees.add(p);
+          trees.add(
+            Tree(
+              p,
+              treeSize / 2,
+              heightCoef: VirtualWorldSettings.treeHeightCoef,
+              layers: VirtualWorldSettings.treeLayers,
+            ),
+          );
           tryCount = 0;
         }
 
@@ -234,13 +245,8 @@ class World extends CustomPainter {
     }
 
     // Trees
-    for (Point p in trees) {
-      p.paint(
-        canvas,
-        size,
-        radius: treeSize / 2,
-        color: Colors.black87.withOpacity(0.5),
-      );
+    for (Tree t in trees) {
+      t.paint(canvas, size, viewPoint: scale(viewport.getOffset(), -1));
     }
   }
 
