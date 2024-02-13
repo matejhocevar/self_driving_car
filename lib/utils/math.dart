@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../common/primitives/point.dart';
 import '../common/primitives/position.dart';
+import '../common/primitives/segment.dart';
 
 double lerp(double a, double b, double t) {
   return a + (b - a) * t;
@@ -51,6 +52,24 @@ Point? getNearestPoint(
     if (dist < minDist && dist < threshold) {
       minDist = dist;
       nearest = p;
+    }
+  }
+  return nearest;
+}
+
+Segment? getNearestSegment(
+  Point point,
+  List<Segment> segments, {
+  double threshold = double.infinity,
+}) {
+  double minDist = double.infinity;
+  Segment? nearest;
+
+  for (Segment s in segments) {
+    double dist = s.distanceToPoint(point);
+    if (dist < minDist && dist < threshold) {
+      minDist = dist;
+      nearest = s;
     }
   }
   return nearest;

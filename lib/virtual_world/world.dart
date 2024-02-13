@@ -8,6 +8,7 @@ import '../common/primitives/polygon.dart';
 import '../common/primitives/segment.dart';
 import '../utils/math.dart';
 import 'graph.dart';
+import 'markings/marking.dart';
 import 'settings.dart';
 import 'street_furniture/building.dart';
 import 'street_furniture/street_furniture.dart';
@@ -43,9 +44,16 @@ class World extends CustomPainter {
 
   List<Envelope> envelopes = List.empty(growable: true);
   List<Segment> roadBorders = List.empty(growable: true);
+  List<Segment> laneGuides = List.empty(growable: true);
+  List<Marking> markings = List.empty(growable: true);
 
   List<Building> buildings = List.empty(growable: true);
   List<Tree> trees = List.empty(growable: true);
+
+  void dispose() {
+    graph.dispose();
+    markings.length = 0;
+  }
 
   void generate() {
     envelopes.length = 0;
@@ -57,6 +65,9 @@ class World extends CustomPainter {
 
     buildings = _generateBuildings();
     trees = _generateTrees();
+
+    laneGuides.length = 0;
+    laneGuides = _generateLaneGuides();
   }
 
   List<Building> _generateBuildings() {
@@ -210,6 +221,21 @@ class World extends CustomPainter {
     return trees;
   }
 
+  List<Segment> _generateLaneGuides() {
+    List<Envelope> tmpEnvelopes = [];
+    for (Segment s in graph.segments) {
+      tmpEnvelopes.add(
+        Envelope(
+          s,
+          width: roadWidth / 2,
+          roundness: roadRoundness,
+        ),
+      );
+    }
+
+    return Polygon.union(tmpEnvelopes.map((e) => e.polygon).toList());
+  }
+
   @override
   void paint(Canvas canvas, Size size) {
     if (graph.hash != graphHash) {
@@ -227,6 +253,11 @@ class World extends CustomPainter {
         fill: VirtualWorldSettings.roadColor,
         lineWidth: VirtualWorldSettings.roadMargin,
       );
+    }
+
+    // Markings
+    for (Marking m in markings) {
+      m.paint(canvas, size);
     }
 
     // Road lane

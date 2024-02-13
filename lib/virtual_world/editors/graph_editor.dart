@@ -89,7 +89,7 @@ class _GraphEditorState extends State<GraphEditor> {
     }
   }
 
-  void handleDragStart(drag) {
+  void _handleDragStart(drag) {
     isDragging = true;
     if (selected != hovered) {
       selected = hovered;
@@ -138,7 +138,7 @@ class _GraphEditorState extends State<GraphEditor> {
       onHover: _handleHover,
       child: GestureDetector(
         onTapDown: _handleTapDown,
-        onPanStart: handleDragStart,
+        onPanStart: _handleDragStart,
         onPanUpdate: _handleDragUpdate,
         onPanEnd: _handleDragEnd,
         onSecondaryTapDown: _handleSecondaryTapDown,
@@ -193,9 +193,7 @@ class GraphEditorPainter extends CustomPainter {
       selected!.paint(canvas, size, outline: true);
     }
 
-    if (hovered != null) {
-      hovered!.paint(canvas, size, fill: true);
-    }
+    hovered?.paint(canvas, size, fill: true);
 
     canvas.restore();
   }

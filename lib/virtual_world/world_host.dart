@@ -3,12 +3,21 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../common/components/toolbar.dart';
+import '../common/components/toolbar_icon.dart';
 import 'editors/graph_editor.dart';
+import 'editors/stop_editor.dart';
 import 'graph.dart';
 import 'settings.dart';
 import 'viewport.dart';
 import 'virtual_world.dart';
 import 'world.dart';
+
+enum WorldMode {
+  unknown,
+  preview,
+  roadEditor,
+  stopEditor,
+}
 
 class WorldHost extends StatefulWidget {
   const WorldHost({super.key});
@@ -25,7 +34,7 @@ class _WorldHostState extends State<WorldHost> {
   late ViewPort viewport;
 
   bool virtualWorldLoaded = false;
-  bool isGraphEditorMode = false;
+  WorldMode _worldMode = WorldMode.preview;
 
   @override
   void initState() {
@@ -60,9 +69,9 @@ class _WorldHostState extends State<WorldHost> {
     });
   }
 
-  void _toggleGraphEditor() {
+  void _setWorldMode(WorldMode mode) {
     setState(() {
-      isGraphEditorMode = !isGraphEditorMode;
+      _worldMode = mode;
     });
   }
 
@@ -87,7 +96,7 @@ class _WorldHostState extends State<WorldHost> {
   }
 
   void _handleDisposeGraph() {
-    graph.dispose();
+    world.dispose();
     prefs.remove('graph');
   }
 
@@ -101,6 +110,12 @@ class _WorldHostState extends State<WorldHost> {
       );
     }
 
+    Widget worldModeWidget = switch (_worldMode) {
+      WorldMode.roadEditor => GraphEditor(world: world, viewport: viewport),
+      WorldMode.stopEditor => StopEditor(world: world, viewport: viewport),
+      _ => VirtualWorld(world: world, viewport: viewport),
+    };
+
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -109,9 +124,7 @@ class _WorldHostState extends State<WorldHost> {
           height: MediaQuery.sizeOf(context).height,
           child: Listener(
             onPointerSignal: _handleScroll,
-            child: isGraphEditorMode
-                ? GraphEditor(world: world, viewport: viewport)
-                : VirtualWorld(world: world, viewport: viewport),
+            child: worldModeWidget,
           ),
         ),
         Positioned(
@@ -122,29 +135,34 @@ class _WorldHostState extends State<WorldHost> {
               backgroundColor: VirtualWorldSettings.controlsBackgroundColor,
               borderRadius: VirtualWorldSettings.controlsRadius,
               children: [
-                IconButton(
-                  icon: Icon(
-                    isGraphEditorMode ? Icons.remove_road : Icons.edit_road,
-                  ),
-                  iconSize: 20,
-                  tooltip: 'Toggle Graph Editor',
-                  color: Colors.white,
-                  onPressed: _toggleGraphEditor,
+                ToolbarIcon(
+                  icon: Icons.public,
+                  tooltip: 'World preview',
+                  isActive: _worldMode == WorldMode.preview,
+                  onTap: () => _setWorldMode(WorldMode.preview),
+                ),
+                ToolbarIcon(
+                  icon: Icons.edit_road,
+                  tooltip: 'Road editor',
+                  isActive: _worldMode == WorldMode.roadEditor,
+                  onTap: () => _setWorldMode(WorldMode.roadEditor),
+                ),
+                ToolbarIcon(
+                  icon: Icons.dangerous,
+                  tooltip: 'Stop editor',
+                  isActive: _worldMode == WorldMode.stopEditor,
+                  onTap: () => _setWorldMode(WorldMode.stopEditor),
                 ),
                 const Spacer(),
-                IconButton(
-                  icon: const Icon(Icons.save),
-                  iconSize: 20,
+                ToolbarIcon(
+                  icon: Icons.save,
                   tooltip: 'Save Graph',
-                  color: Colors.white,
-                  onPressed: _handleSaveGraph,
+                  onTap: _handleSaveGraph,
                 ),
-                IconButton(
-                  icon: const Icon(Icons.delete_forever),
-                  iconSize: 20,
+                ToolbarIcon(
+                  icon: Icons.delete_forever,
                   tooltip: 'Dispose Graph',
-                  color: Colors.white,
-                  onPressed: _handleDisposeGraph,
+                  onTap: _handleDisposeGraph,
                 ),
               ],
             ),
