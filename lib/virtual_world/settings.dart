@@ -18,12 +18,16 @@ class VirtualWorldSettings {
   static const double buildingWidth = 150;
   static const double buildingMinLength = 150;
   static const double buildingSpacing = 50;
-  static const double buildingHeightCoef = 0.3;
+  static const double buildingHeight = 120;
+  static const Color buildingSideColor = Color(0xffffffff);
+  static const Color buildingSideBorderColor = Color(0xaaaaaaaa);
+  static const Color buildingRoofColor = Color(0xffd44444);
+  static const Color buildingRoofBorderColor = Color(0xffc44444);
 
   // Trees
   static const double treeSize = 160;
   static const int treeTryCount = 100;
-  static const double treeHeightCoef = 0.3;
+  static const double treeHeight = 200;
   static const int treeLayers = 7;
 
   // Graph Editor

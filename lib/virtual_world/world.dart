@@ -123,7 +123,11 @@ class World extends CustomPainter {
         .map(
           (b) => Building(
             b,
-            heightCoef: VirtualWorldSettings.buildingHeightCoef,
+            height: VirtualWorldSettings.buildingHeight,
+            sideColor: VirtualWorldSettings.buildingSideColor,
+            sideBorderColor: VirtualWorldSettings.buildingSideBorderColor,
+            roofColor: VirtualWorldSettings.buildingRoofColor,
+            roofBorderColor: VirtualWorldSettings.buildingRoofBorderColor,
           ),
         )
         .toList();
@@ -192,7 +196,7 @@ class World extends CustomPainter {
             Tree(
               p,
               treeSize / 2,
-              heightCoef: VirtualWorldSettings.treeHeightCoef,
+              height: VirtualWorldSettings.treeHeight,
               layers: VirtualWorldSettings.treeLayers,
             ),
           );

@@ -3,7 +3,6 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:self_driving_car/utils/math.dart';
 
-import '../../utils/canvas.dart';
 import 'point.dart';
 import 'position.dart';
 import 'segment.dart';
@@ -128,12 +127,6 @@ class Polygon extends CustomPainter {
     return intersections % 2 == 1;
   }
 
-  void paintSegments(Canvas canvas, Size size) {
-    for (Segment s in segments) {
-      s.paint(canvas, size, color: getRandomColor(), width: 5);
-    }
-  }
-
   @override
   void paint(
     Canvas canvas,
@@ -141,22 +134,26 @@ class Polygon extends CustomPainter {
     Color stroke = Colors.transparent,
     double lineWidth = 2,
     Color fill = Colors.blue,
+    StrokeJoin strokeJoin = StrokeJoin.miter,
   }) {
     if (points.isNotEmpty) {
       Paint fillPaint = Paint()
         ..color = fill
         ..style = PaintingStyle.fill
-        ..strokeWidth = lineWidth;
+        ..strokeWidth = lineWidth
+        ..strokeJoin = strokeJoin;
 
       Paint marginPaint = Paint()
         ..color = fill
         ..style = PaintingStyle.stroke
-        ..strokeWidth = lineWidth;
+        ..strokeWidth = lineWidth
+        ..strokeJoin = strokeJoin;
 
       Paint strokePaint = Paint()
         ..color = stroke
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 2;
+        ..strokeWidth = 2
+        ..strokeJoin = strokeJoin;
 
       Path path = Path();
       path.moveTo(points[0].x, points[0].y);

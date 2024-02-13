@@ -121,6 +121,13 @@ double angle(Point p) {
   return math.atan2(p.y, p.x);
 }
 
+Point getFake3DPoint(Point p, Point viewPoint, double height) {
+  Point dir = normalize(subtract(p, viewPoint));
+  double dist = distance(p, viewPoint);
+  double scaler = math.atan(dist / 300) / (math.pi / 2);
+  return add(p, scale(dir, height * scaler));
+}
+
 extension RGBA on double {
   Color toRGBA() {
     double value = this;

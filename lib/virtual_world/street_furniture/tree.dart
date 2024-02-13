@@ -11,13 +11,13 @@ class Tree extends CustomPainter implements StreetFurniture {
   const Tree(
     this.center,
     this.radius, {
-    this.heightCoef = 0.3,
+    this.height = 200,
     this.layers = 7,
   });
 
   final Point center;
   final double radius;
-  final double heightCoef;
+  final double height;
   final int layers;
 
   @override
@@ -41,11 +41,10 @@ class Tree extends CustomPainter implements StreetFurniture {
     Point? viewPoint,
   }) {
     viewPoint ??= Point(0, 0);
-    Point diff = subtract(center, viewPoint);
-    Point top = add(center, scale(diff, heightCoef));
+    Point top = getFake3DPoint(center, viewPoint, height);
 
-    for (int level = 0; level < layers; level++) {
-      final t = level / (layers - 1);
+    for (int layer = 0; layer < layers; layer++) {
+      final t = layer / (layers - 1);
       final point = lerp2D(center, top, t);
       final color = Color.fromRGBO(30, lerp(50, 200, t).toInt(), 70, 1);
       final levelRadius = lerp(radius, 40, t);
@@ -60,5 +59,5 @@ class Tree extends CustomPainter implements StreetFurniture {
       center != oldDelegate.center ||
       radius != oldDelegate.radius ||
       layers != oldDelegate.layers ||
-      heightCoef != oldDelegate.heightCoef;
+      height != oldDelegate.height;
 }
