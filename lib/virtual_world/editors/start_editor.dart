@@ -5,7 +5,6 @@ import '../../common/primitives/segment.dart';
 import '../../common/vehicle.dart';
 import '../markings/marking.dart';
 import '../markings/start.dart';
-import '../viewport.dart';
 import '../world.dart';
 import 'marking_editor.dart';
 
@@ -13,13 +12,11 @@ class StartEditor extends MarkingEditor {
   const StartEditor({
     Key? key,
     required World world,
-    required ViewPort viewport,
     required List<Segment> targetSegments,
     required this.vehicle,
   }) : super(
           key: key,
           world: world,
-          viewport: viewport,
           targetSegments: targetSegments,
         );
 

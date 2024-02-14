@@ -384,6 +384,8 @@ class World extends CustomPainter {
   @override
   String toString() {
     Map<String, dynamic> json = {
+      'viewport_zoom': viewport.zoom,
+      'viewport_offset': viewport.offset.toJSON(),
       'graph': graph.toString(),
       'graphHash': graphHash,
       'envelopes': envelopes.map((e) => e.toString()).toList(),
@@ -396,7 +398,7 @@ class World extends CustomPainter {
     return jsonEncode(json);
   }
 
-  static World fromString(String? str, {required ViewPort viewport}) {
+  static World fromString(String? str, {required Size size}) {
     try {
       if (str == null || str.isEmpty) {
         throw const FormatException('Unable to parse the model from cache.');
@@ -404,10 +406,19 @@ class World extends CustomPainter {
 
       final json = jsonDecode(str);
 
+      Point viewportOffset = Point.fromJSON(
+        List<double>.from(json['viewport_offset']),
+      );
+
       Graph graph = Graph.fromString(json['graph']);
       World world = World(
         graph: graph,
-        viewport: viewport,
+        viewport: ViewPort(
+          width: size.width,
+          height: size.height,
+          zoom: json['viewport_zoom'],
+          offset: viewportOffset,
+        ),
         graphHash: graph.hash,
       );
 
@@ -448,12 +459,14 @@ class World extends CustomPainter {
         ..buildings = buildings
         ..trees = trees
         ..markings = markings;
-    } catch (e, stackTrace) {
+    } catch (e) {
       print(e);
-      print(stackTrace);
       print('Creating a new instance...');
     }
 
-    return World(graph: Graph(), viewport: viewport);
+    return World(
+      graph: Graph(),
+      viewport: ViewPort(width: size.width, height: size.height),
+    );
   }
 }

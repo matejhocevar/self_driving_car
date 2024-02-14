@@ -12,11 +12,9 @@ class GraphEditor extends StatefulWidget {
   const GraphEditor({
     super.key,
     required this.world,
-    required this.viewport,
   });
 
   final World world;
-  final ViewPort viewport;
 
   @override
   State<GraphEditor> createState() => _GraphEditorState();
@@ -37,7 +35,7 @@ class _GraphEditorState extends State<GraphEditor> {
     super.initState();
 
     graph = widget.world.graph;
-    viewport = widget.viewport;
+    viewport = widget.world.viewport;
   }
 
   void _removePoint(Point? p) {
@@ -145,7 +143,6 @@ class _GraphEditorState extends State<GraphEditor> {
         child: CustomPaint(
           painter: GraphEditorPainter(
             world: widget.world,
-            viewport: widget.viewport,
             selected: selected,
             hovered: hovered,
             mouse: mouse,
@@ -159,20 +156,19 @@ class _GraphEditorState extends State<GraphEditor> {
 class GraphEditorPainter extends CustomPainter {
   const GraphEditorPainter({
     required this.world,
-    required this.viewport,
     this.selected,
     this.hovered,
     this.mouse,
   });
 
   final World world;
-  final ViewPort viewport;
   final Point? selected;
   final Point? hovered;
   final Point? mouse;
 
   @override
   void paint(Canvas canvas, Size size) {
+    ViewPort viewport = world.viewport;
     canvas.drawPaint(Paint()..color = Colors.green);
 
     canvas.save();

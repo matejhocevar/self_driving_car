@@ -15,12 +15,10 @@ abstract class MarkingEditor extends StatefulWidget {
   const MarkingEditor({
     Key? key,
     required this.world,
-    required this.viewport,
     required this.targetSegments,
   }) : super(key: key);
 
   final World world;
-  final ViewPort viewport;
   final List<Segment> targetSegments;
 
   @override
@@ -50,7 +48,7 @@ class _MarkingEditorState extends State<MarkingEditor> {
   void initState() {
     super.initState();
     graph = widget.world.graph;
-    viewport = widget.viewport;
+    viewport = widget.world.viewport;
   }
 
   void _handleHover(PointerHoverEvent event) {
@@ -108,7 +106,6 @@ class _MarkingEditorState extends State<MarkingEditor> {
         child: CustomPaint(
           painter: MarkingEditorPainter(
             world: widget.world,
-            viewport: widget.viewport,
             mouse: mouse,
             intent: intent,
           ),
@@ -121,18 +118,18 @@ class _MarkingEditorState extends State<MarkingEditor> {
 class MarkingEditorPainter extends CustomPainter {
   const MarkingEditorPainter({
     required this.world,
-    required this.viewport,
     this.mouse,
     this.intent,
   });
 
   final World world;
-  final ViewPort viewport;
   final Point? mouse;
   final Marking? intent;
 
   @override
   void paint(Canvas canvas, Size size) {
+    ViewPort viewport = world.viewport;
+
     canvas.save();
     canvas.translate(viewport.center.x, viewport.center.y);
     canvas.scale(1 / viewport.zoom, 1 / viewport.zoom);

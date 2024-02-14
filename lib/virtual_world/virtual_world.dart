@@ -9,11 +9,9 @@ class VirtualWorld extends StatefulWidget {
   const VirtualWorld({
     super.key,
     required this.world,
-    required this.viewport,
   });
 
   final World world;
-  final ViewPort viewport;
 
   @override
   State<VirtualWorld> createState() => _VirtualWorldState();
@@ -27,7 +25,7 @@ class _VirtualWorldState extends State<VirtualWorld> {
   void initState() {
     super.initState();
 
-    viewport = widget.viewport;
+    viewport = widget.world.viewport;
   }
 
   void _handlePanStart(DragStartDetails e) {
@@ -55,7 +53,6 @@ class _VirtualWorldState extends State<VirtualWorld> {
       child: CustomPaint(
         painter: VirtualWorldPainter(
           world: widget.world,
-          viewport: viewport,
         ),
       ),
     );
@@ -65,14 +62,14 @@ class _VirtualWorldState extends State<VirtualWorld> {
 class VirtualWorldPainter extends CustomPainter {
   const VirtualWorldPainter({
     required this.world,
-    required this.viewport,
   });
 
   final World world;
-  final ViewPort viewport;
 
   @override
   void paint(Canvas canvas, Size size) {
+    ViewPort viewport = world.viewport;
+
     canvas.drawPaint(Paint()..color = Colors.grey);
 
     canvas.save();
