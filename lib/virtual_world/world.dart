@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:collection/collection.dart';
@@ -22,28 +23,36 @@ class World extends CustomPainter {
   World({
     required this.graph,
     required this.viewport,
-    this.roadWidth = 100,
-    this.roadRoundness = 3,
-    this.buildingWidth = 150,
-    this.buildingMinLength = 150,
-    this.spacing = 50,
-    this.treeSize = 160,
-    this.treeTryCount = 100,
+    double? roadWidth,
+    int? roadRoundness,
+    double? buildingWidth,
+    double? buildingMinLength,
+    double? spacing,
+    double? treeSize,
+    int? treeTryCount,
+    this.graphHash,
   }) {
-    generate();
+    this.roadWidth = roadWidth ?? VirtualWorldSettings.roadWidth;
+    this.roadRoundness = roadRoundness ?? VirtualWorldSettings.roadRoundness;
+    this.buildingWidth = buildingWidth ?? VirtualWorldSettings.buildingWidth;
+    this.buildingMinLength =
+        buildingMinLength ?? VirtualWorldSettings.buildingMinLength;
+    this.spacing = spacing ?? VirtualWorldSettings.buildingSpacing;
+    this.treeSize = treeSize ?? VirtualWorldSettings.treeSize;
+    this.treeTryCount = treeTryCount ?? VirtualWorldSettings.treeTryCount;
   }
 
   final Graph graph;
   final ViewPort viewport;
   String? graphHash;
-  final double roadWidth;
-  final int roadRoundness;
+  late final double roadWidth;
+  late final int roadRoundness;
 
-  final double buildingWidth;
-  final double buildingMinLength;
-  final double spacing;
-  final double treeSize;
-  final int treeTryCount;
+  late final double buildingWidth;
+  late final double buildingMinLength;
+  late final double spacing;
+  late final double treeSize;
+  late final int treeTryCount;
 
   List<Envelope> envelopes = List.empty(growable: true);
   List<Segment> roadBorders = List.empty(growable: true);
@@ -371,4 +380,80 @@ class World extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+
+  @override
+  String toString() {
+    Map<String, dynamic> json = {
+      'graph': graph.toString(),
+      'graphHash': graphHash,
+      'envelopes': envelopes.map((e) => e.toString()).toList(),
+      'road_borders': roadBorders.map((r) => r.toJSON()).toList(),
+      'lane_guides': laneGuides.map((l) => l.toJSON()).toList(),
+      'buildings': buildings.map((b) => b.toString()).toList(),
+      'trees': trees.map((t) => t.toString()).toList(),
+      'markings': markings.map((m) => m.toString()).toList(),
+    };
+    return jsonEncode(json);
+  }
+
+  static World fromString(String? str, {required ViewPort viewport}) {
+    try {
+      if (str == null || str.isEmpty) {
+        throw const FormatException('Unable to parse the model from cache.');
+      }
+
+      final json = jsonDecode(str);
+
+      Graph graph = Graph.fromString(json['graph']);
+      World world = World(
+        graph: graph,
+        viewport: viewport,
+        graphHash: graph.hash,
+      );
+
+      // Envelopes
+      List<Envelope> envelopes = (json['envelopes'] as List<dynamic>)
+          .map((e) => Envelope.fromString(e))
+          .toList();
+
+      // Road borders
+      List<Segment> roadBorders = (json['road_borders'] as List<dynamic>)
+          .map((r) => Segment.load(r))
+          .toList();
+
+      // Lane guides
+      List<Segment> laneGuides = (json['lane_guides'] as List<dynamic>)
+          .map((l) => Segment.load(l))
+          .toList();
+
+      // Buildings
+      List<Building> buildings = (json['buildings'] as List<dynamic>)
+          .map((b) => Building.fromString(b))
+          .toList();
+
+      // Trees
+      List<Tree> trees = (json['trees'] as List<dynamic>)
+          .map((t) => Tree.fromString(t))
+          .toList();
+
+      // Markings
+      List<Marking> markings = (json['markings'] as List<dynamic>)
+          .map((m) => Marking.fromString(m))
+          .toList();
+
+      return world
+        ..envelopes = envelopes
+        ..roadBorders = roadBorders
+        ..laneGuides = laneGuides
+        ..buildings = buildings
+        ..trees = trees
+        ..markings = markings;
+    } catch (e, stackTrace) {
+      print(e);
+      print(stackTrace);
+      print('Creating a new instance...');
+    }
+
+    return World(graph: Graph(), viewport: viewport);
+  }
 }

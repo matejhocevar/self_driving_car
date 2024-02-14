@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../network/level.dart';
 import '../../network/neural_network.dart';
+import '../../utils/color.dart';
 import '../../utils/math.dart';
 import '../settings.dart';
 

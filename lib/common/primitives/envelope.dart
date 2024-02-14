@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -8,8 +9,13 @@ import 'polygon.dart';
 import 'segment.dart';
 
 class Envelope extends CustomPainter {
-  Envelope(this.skeleton, {required this.width, this.roundness = 1}) {
-    polygon = _generatePolygon(width, roundness: roundness);
+  Envelope(
+    this.skeleton, {
+    required this.width,
+    this.roundness = 1,
+    Polygon? polygon,
+  }) {
+    this.polygon = polygon ?? _generatePolygon(width, roundness: roundness);
   }
 
   final Segment skeleton;
@@ -56,4 +62,30 @@ class Envelope extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+
+  static Envelope fromString(String str) {
+    final json = jsonDecode(str);
+    Segment skeleton = Segment.load(json['skeleton']);
+    List<Point> polygonPoints = (json['polygon'] as List<dynamic>)
+        .map((p) => Point.fromJSON(List<double>.from(p)))
+        .toList();
+    Polygon polygon = Polygon(polygonPoints);
+    return Envelope(
+      skeleton,
+      width: json['width'],
+      roundness: json['roundness'],
+      polygon: polygon,
+    );
+  }
+
+  @override
+  String toString() {
+    Map<String, dynamic> json = {
+      'skeleton': skeleton.toJSON(),
+      'width': width,
+      'roundness': roundness,
+      'polygon': polygon.points.map((p) => p.toJSON()).toList(),
+    };
+    return jsonEncode(json);
+  }
 }

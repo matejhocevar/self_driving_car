@@ -11,11 +11,15 @@ class Parking extends Marking {
     Point directionVector, {
     double width = 20,
     double height = 10,
-  }) : super(center, directionVector, width: width, height: height) {
-    borders = [polygon.segments[0], polygon.segments[2]];
+  }) : super(
+          MarkingType.parking,
+          center,
+          directionVector,
+          width: width,
+          height: height,
+        ) {
+    super.borders = [polygon.segments[0], polygon.segments[2]];
   }
-
-  late List<Segment> borders;
 
   @override
   void paint(Canvas canvas, Size size) {

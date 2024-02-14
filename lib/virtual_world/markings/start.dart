@@ -14,7 +14,14 @@ class Start extends Marking {
     this.vehicle, {
     double width = 20,
     double height = 10,
-  }) : super(center, directionVector, width: width, height: height);
+  }) : super(
+          MarkingType.start,
+          center,
+          directionVector,
+          width: width,
+          height: height,
+          extras: {'vehicle': vehicle.name},
+        );
 
   final Vehicle vehicle;
 

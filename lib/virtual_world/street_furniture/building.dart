@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:self_driving_car/utils/color.dart';
 
 import '../../common/primitives/point.dart';
 import '../../common/primitives/polygon.dart';
@@ -6,14 +9,16 @@ import '../../utils/math.dart';
 import 'street_furniture.dart';
 
 class Building extends CustomPainter implements StreetFurniture {
-  const Building(
+  Building(
     this.polygon, {
     this.height = 120,
     this.sideColor = const Color(0xffffffff),
     this.sideBorderColor = const Color(0xffaaaaaa),
     this.roofColor = const Color(0xffd44444),
     this.roofBorderColor = const Color(0xffd44444),
-  });
+  }) {
+    base = polygon;
+  }
 
   final Polygon polygon;
   final double height;
@@ -23,7 +28,7 @@ class Building extends CustomPainter implements StreetFurniture {
   final Color roofBorderColor;
 
   @override
-  Polygon get base => polygon;
+  late Polygon base;
 
   @override
   void paint(
@@ -120,4 +125,34 @@ class Building extends CustomPainter implements StreetFurniture {
   @override
   bool shouldRepaint(covariant Building oldDelegate) =>
       polygon != oldDelegate.polygon || height != oldDelegate.height;
+
+  @override
+  String toString() {
+    Map<String, dynamic> json = {
+      'polygon': polygon.points.map((p) => p.toJSON()).toList(),
+      'height': height,
+      'side_color': sideColor.toString(),
+      'side_border_color': sideBorderColor.toString(),
+      'roof_color': roofColor.toString(),
+      'roof_border_color': roofBorderColor.toString(),
+    };
+    return jsonEncode(json);
+  }
+
+  static Building fromString(String str) {
+    final json = jsonDecode(str);
+
+    List<Point> polygonPoints = (json['polygon'] as List<dynamic>)
+        .map((p) => Point.fromJSON(List<double>.from(p)))
+        .toList();
+    Polygon polygon = Polygon(polygonPoints);
+
+    return Building(
+      polygon,
+      sideColor: (json['side_color'] as String).toColor(),
+      sideBorderColor: (json['side_border_color'] as String).toColor(),
+      roofColor: (json['roof_color'] as String).toColor(),
+      roofBorderColor: (json['roof_border_color'] as String).toColor(),
+    );
+  }
 }

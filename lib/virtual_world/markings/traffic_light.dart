@@ -18,11 +18,16 @@ class TrafficLight extends Marking {
     Point directionVector, {
     double width = 20,
     double height = 20,
-  }) : super(center, directionVector, width: width, height: 18) {
-    border = polygon.segments[0];
+  }) : super(
+          MarkingType.trafficLight,
+          center,
+          directionVector,
+          width: width,
+          height: 18,
+        ) {
+    super.borders = [polygon.segments[0]];
   }
 
-  late Segment border;
   TrafficLightState state = TrafficLightState.off;
 
   @override

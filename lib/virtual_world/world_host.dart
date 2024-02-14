@@ -71,21 +71,10 @@ class _WorldHostState extends State<WorldHost> {
   Future<void> _generateVirtualWorld() async {
     await loadAssets();
 
-    graph = await _loadGraph() ?? Graph();
     Size size =
         WidgetsBinding.instance.platformDispatcher.views.first.physicalSize;
     viewport = ViewPort(height: size.height, width: size.width);
-    world = World(
-      graph: graph,
-      viewport: viewport,
-      roadWidth: VirtualWorldSettings.roadWidth,
-      roadRoundness: VirtualWorldSettings.roadRoundness,
-      buildingWidth: VirtualWorldSettings.buildingWidth,
-      buildingMinLength: VirtualWorldSettings.buildingMinLength,
-      spacing: VirtualWorldSettings.buildingSpacing,
-      treeSize: VirtualWorldSettings.treeSize,
-      treeTryCount: VirtualWorldSettings.treeTryCount,
-    );
+    world = await _loadWorld(viewport);
 
     setState(() {
       virtualWorldLoaded = true;
@@ -110,22 +99,18 @@ class _WorldHostState extends State<WorldHost> {
     }
   }
 
-  Future<Graph?> _loadGraph() async {
-    String? graph = prefs.getString('graph');
-    if (graph != null) {
-      return Graph.fromString(graph);
-    }
-
-    return null;
+  Future<World> _loadWorld(ViewPort viewport) async {
+    String? world = prefs.getString('world');
+    return World.fromString(world, viewport: viewport);
   }
 
-  Future<void> _handleSaveGraph() async {
-    prefs.setString('graph', graph.toString());
+  Future<void> _handleSaveWorld() async {
+    prefs.setString('world', world.toString());
   }
 
-  void _handleDisposeGraph() {
+  void _handleDisposeWorld() {
     world.dispose();
-    prefs.remove('graph');
+    prefs.remove('world');
   }
 
   @override
@@ -259,12 +244,12 @@ class _WorldHostState extends State<WorldHost> {
                 ToolbarIcon(
                   icon: Icons.save,
                   tooltip: 'Save Graph',
-                  onTap: _handleSaveGraph,
+                  onTap: _handleSaveWorld,
                 ),
                 ToolbarIcon(
                   icon: Icons.delete_forever,
                   tooltip: 'Dispose Graph',
-                  onTap: _handleDisposeGraph,
+                  onTap: _handleDisposeWorld,
                 ),
               ],
             ),

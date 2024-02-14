@@ -3,7 +3,6 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../../common/primitives/point.dart';
-import '../../common/primitives/segment.dart';
 import '../../utils/math.dart';
 import 'marking.dart';
 
@@ -13,15 +12,19 @@ class Stop extends Marking {
     Point directionVector, {
     double width = 20,
     double height = 10,
-  }) : super(center, directionVector, width: width, height: height) {
-    border = polygon.segments[2];
+  }) : super(
+          MarkingType.stop,
+          center,
+          directionVector,
+          width: width,
+          height: height,
+        ) {
+    super.borders = [polygon.segments[2]];
   }
-
-  late Segment border;
 
   @override
   void paint(Canvas canvas, Size size) {
-    border.paint(canvas, size, width: 5, color: Colors.white);
+    borders.first.paint(canvas, size, width: 5, color: Colors.white);
 
     canvas.save();
 

@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 import '../common/primitives/point.dart';
@@ -81,12 +82,9 @@ class Graph extends CustomPainter {
         .map((p) => Point.fromJSON(List<double>.from(p)))
         .toList();
 
-    List<Segment> segments = (json['segments'] as List<dynamic>).map((s) {
-      final [p1x, p1y, p2x, p2y] = List<double>.from(s);
-      var p1 = points.firstWhere((Point pp) => pp.x == p1x && pp.y == p1y);
-      var p2 = points.firstWhere((Point pp) => pp.x == p2x && pp.y == p2y);
-      return Segment(p1, p2);
-    }).toList();
+    List<Segment> segments = (json['segments'] as List<dynamic>)
+        .map((s) => Segment.load(s, points: points))
+        .toList();
 
     return Graph()
       ..points = points

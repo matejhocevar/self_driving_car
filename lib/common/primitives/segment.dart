@@ -56,7 +56,7 @@ class Segment extends CustomPainter {
     Color color = Colors.black87,
     List<int> dash = const [],
     bool showPartialDash = false,
-    StrokeCap strokeCap = StrokeCap.square,
+    StrokeCap strokeCap = StrokeCap.butt,
   }) {
     Paint paint = Paint()
       ..color = color
@@ -94,5 +94,22 @@ class Segment extends CustomPainter {
 
   List<double> toJSON() {
     return [p1.x, p1.y, p2.x, p2.y];
+  }
+
+  static Segment load(
+    List<dynamic> rawSegment, {
+    List<Point> points = const [],
+  }) {
+    final [p1x, p1y, p2x, p2y] = List<double>.from(rawSegment);
+    late Point p1;
+    late Point p2;
+    if (points.isNotEmpty) {
+      p1 = points.firstWhere((Point pp) => pp.x == p1x && pp.y == p1y);
+      p2 = points.firstWhere((Point pp) => pp.x == p2x && pp.y == p2y);
+    } else {
+      p1 = Point(p1x, p1y);
+      p2 = Point(p2x, p2y);
+    }
+    return Segment(p1, p2);
   }
 }

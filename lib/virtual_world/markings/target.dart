@@ -9,7 +9,14 @@ class Target extends Marking {
     Point directionVector, {
     double width = 20,
     double height = 10,
-  }) : super(center, directionVector, width: width, height: height);
+  }) : super(
+          MarkingType.target,
+          center,
+          directionVector,
+          width: width,
+          height: height,
+          borders: const [],
+        );
 
   @override
   void paint(Canvas canvas, Size size) {

@@ -150,15 +150,3 @@ Point getFake3DPoint(Point p, Point viewPoint, double height) {
   double scaler = math.atan(dist / 300) / (math.pi / 2);
   return add(p, scale(dir, height * scaler));
 }
-
-extension RGBA on double {
-  Color toRGBA() {
-    double value = this;
-    double opacity = value.abs();
-    int r = value < 0 ? 0 : 255;
-    int g = r;
-    int b = value > 0 ? 0 : 255;
-
-    return Color.fromRGBO(r, g, b, opacity);
-  }
-}

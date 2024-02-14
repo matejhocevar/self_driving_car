@@ -13,15 +13,21 @@ class Yield extends Marking {
     Point directionVector, {
     double width = 20,
     double height = 10,
-  }) : super(center, directionVector, width: width, height: height) {
-    border = polygon.segments[2];
+  }) : super(
+          MarkingType.yield,
+          center,
+          directionVector,
+          width: width,
+          height: height,
+        ) {
+    super.borders = [polygon.segments[2]];
   }
 
   late Segment border;
 
   @override
   void paint(Canvas canvas, Size size) {
-    border.paint(canvas, size, width: 5, color: Colors.white);
+    borders.first.paint(canvas, size, width: 5, color: Colors.white);
 
     canvas.save();
 
