@@ -255,9 +255,10 @@ class _WorldHostState extends State<WorldHost> {
               ),
             ),
             Positioned(
-              bottom: VirtualWorldSettings.controlsMargin,
+              left: VirtualWorldSettings.controlsMargin,
               child: Center(
                 child: Toolbar(
+                  direction: Axis.vertical,
                   size: VirtualWorldSettings.controlsSize,
                   backgroundColor: VirtualWorldSettings.controlsBackgroundColor,
                   borderRadius: VirtualWorldSettings.controlsRadius,
