@@ -33,8 +33,7 @@ class Point extends CustomPainter {
       canvas.drawCircle(
         offset,
         radius * 0.6,
-        VirtualWorldSettings.graphEditorSelectedPaint
-          ..style = PaintingStyle.stroke,
+        VirtualWorldSettings.editorSelectedPaint..style = PaintingStyle.stroke,
       );
     }
 
@@ -42,7 +41,7 @@ class Point extends CustomPainter {
       canvas.drawCircle(
         offset,
         radius * 0.4,
-        VirtualWorldSettings.graphEditorHoveredPaint,
+        VirtualWorldSettings.editorHoveredPaint,
       );
     }
   }

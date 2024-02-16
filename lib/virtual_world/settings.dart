@@ -15,6 +15,9 @@ class VirtualWorldSettings {
   static const double viewportZoomMin = 1;
   static const double viewportZoomMax = 5;
 
+  // Environment
+  static const Color surfaceColor = Color(0xff37ae0f);
+
   // Road
   static const double roadWidth = 100;
   static const double roadMargin = 15;
@@ -39,16 +42,19 @@ class VirtualWorldSettings {
   static const double treeHeight = 200;
   static const int treeLayers = 7;
 
-  // Graph Editor
-  static Paint graphEditorSelectedPaint = Paint()
+  // Editors
+  static const Color editorBlueprintColor = Color(0xff2168e8);
+  static const double editorBlueprintGridSize = 100;
+  static const double editorBlueprintBufferFactor = 3;
+  static Paint editorSelectedPaint = Paint()
     ..color = Colors.yellow
     ..strokeWidth = 2
     ..style = PaintingStyle.stroke;
-  static Paint graphEditorHoveredPaint = Paint()
+  static Paint editorHoveredPaint = Paint()
     ..color = Colors.yellow
     ..strokeWidth = 2
     ..style = PaintingStyle.fill;
-  static const double graphEditorSelectedThreshold = 16;
+  static const double editorSelectedThreshold = 16;
 
   // Traffic lights
   static const int trafficLightsGreenDuration = 2;

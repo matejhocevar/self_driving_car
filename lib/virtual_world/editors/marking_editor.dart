@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
+import '../../common/canvas/blueprint.dart';
 import '../../common/primitives/point.dart';
 import '../../common/primitives/polygon.dart';
 import '../../common/primitives/segment.dart';
@@ -60,8 +61,7 @@ class _MarkingEditorState extends State<MarkingEditor> {
     Segment? segment = getNearestSegment(
       mouse!,
       widget.targetSegments,
-      threshold:
-          VirtualWorldSettings.graphEditorSelectedThreshold * viewport.zoom,
+      threshold: VirtualWorldSettings.editorSelectedThreshold * viewport.zoom,
     );
 
     if (segment != null) {
@@ -129,6 +129,8 @@ class MarkingEditorPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     ViewPort viewport = world.viewport;
+
+    BlueprintPainter().paint(canvas, size, viewport: viewport);
 
     canvas.save();
     canvas.translate(viewport.center.x, viewport.center.y);

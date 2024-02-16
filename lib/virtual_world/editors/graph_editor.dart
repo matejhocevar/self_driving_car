@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../common/canvas/blueprint.dart';
 import '../../common/primitives/point.dart';
 import '../../common/primitives/segment.dart';
 import '../../utils/math.dart';
@@ -64,8 +65,7 @@ class _GraphEditorState extends State<GraphEditor> {
     hovered = getNearestPoint(
       mouse!,
       graph.points,
-      threshold:
-          VirtualWorldSettings.graphEditorSelectedThreshold * viewport.zoom,
+      threshold: VirtualWorldSettings.editorSelectedThreshold * viewport.zoom,
     );
     setState(() {});
   }
@@ -169,7 +169,8 @@ class GraphEditorPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     ViewPort viewport = world.viewport;
-    canvas.drawPaint(Paint()..color = Colors.green);
+
+    BlueprintPainter().paint(canvas, size, viewport: viewport);
 
     canvas.save();
 

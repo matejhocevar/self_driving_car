@@ -337,7 +337,7 @@ class VirtualWorldPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     ViewPort viewport = world.viewport;
 
-    canvas.drawPaint(Paint()..color = Colors.grey);
+    canvas.drawPaint(Paint()..color = VirtualWorldSettings.surfaceColor);
 
     canvas.save();
 
