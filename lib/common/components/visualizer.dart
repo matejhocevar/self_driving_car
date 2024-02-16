@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../../infinity_road/settings.dart';
 import '../../network/level.dart';
 import '../../network/neural_network.dart';
 import '../../utils/color.dart';
 import '../../utils/math.dart';
-import '../settings.dart';
 
 class VisualiserPainter extends CustomPainter {
   const VisualiserPainter({

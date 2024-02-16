@@ -70,36 +70,14 @@ class Car extends CustomPainter {
 
   NeuralNetwork? brain;
   bool useBrain = false;
+  double fitness = 0;
 
   late List<Offset> polygon;
-
-  Car copyWith({
-    double? x,
-    double? y,
-    double? width,
-    double? height,
-    double? speed,
-    double? angle,
-    ControlType? controlType,
-    Vehicle? vehicle,
-    double? vehicleOpacity,
-  }) {
-    return Car(
-      x: x ?? this.x,
-      y: y ?? this.y,
-      width: width ?? this.width,
-      height: height ?? this.height,
-      controlType: controlType ?? this.controlType,
-      speed: speed ?? this.speed,
-      angle: angle ?? this.angle,
-      vehicle: vehicle ?? this.vehicle,
-      vehicleOpacity: vehicleOpacity ?? this.vehicleOpacity,
-    );
-  }
 
   void update(List<List<Offset>> roadBorders, List<Car> traffic) {
     if (!damaged) {
       _move();
+      fitness += speed;
       polygon = _createPolygon();
       damaged = _assessDamage(roadBorders, traffic);
     }

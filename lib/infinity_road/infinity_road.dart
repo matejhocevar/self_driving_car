@@ -6,14 +6,14 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../common/car.dart';
+import '../common/components/progressbar.dart';
 import '../common/components/toolbar.dart';
+import '../common/components/visualizer.dart';
 import '../common/constants/vehicles.dart';
 import '../common/controls.dart';
 import '../common/sensor.dart';
 import '../common/vehicle.dart';
 import '../network/neural_network.dart';
-import 'components/progressbar.dart';
-import 'components/visualizer.dart';
 import 'road.dart';
 import 'settings.dart';
 
@@ -38,7 +38,7 @@ class _InfinityRoadState extends State<InfinityRoad>
   List<Car> traffic = [];
 
   Car? bestCar;
-  double bestY = 0.01;
+  double bestFitness = 0.01;
 
   @override
   void initState() {
@@ -148,21 +148,21 @@ class _InfinityRoadState extends State<InfinityRoad>
   void _selectTheBestCar() {
     bestCar!.showSensor = false;
     bestCar!.vehicleOpacity = InfinityRoadSettings.trainingCarsOpacity;
-    double minY = cars.map((Car car) => car.y).reduce(math.min);
-    bestCar = cars.firstWhere((Car c) => c.y == minY);
+    double maxFitness = cars.map((Car car) => car.fitness).reduce(math.max);
+    bestCar = cars.firstWhere((Car c) => c.fitness == maxFitness);
     bestCar!.showSensor = true;
     bestCar!.vehicleOpacity = 1;
   }
 
   _saveModel() async {
     await prefs.setString('bestBrain', bestCar!.brain.toString());
-    await prefs.setDouble('bestY', bestCar!.y);
+    await prefs.setDouble('bestFitness', bestCar!.fitness);
     print('Models successfully saved!');
   }
 
   Future<NeuralNetwork?> _loadModel() async {
     String? brain = prefs.getString('bestBrain');
-    bestY = prefs.getDouble('bestY') ?? bestY;
+    bestFitness = prefs.getDouble('bestFitness') ?? bestFitness;
 
     if (brain != null) {
       return NeuralNetwork.fromString(brain);
@@ -173,7 +173,7 @@ class _InfinityRoadState extends State<InfinityRoad>
 
   _discardModel() async {
     await prefs.remove('bestBrain');
-    await prefs.remove('bestY');
+    await prefs.remove('bestFitness');
     print('Models disposed!');
   }
 
@@ -203,7 +203,8 @@ class _InfinityRoadState extends State<InfinityRoad>
     }
 
     final int drivingCars = cars.where((Car c) => !c.damaged).length;
-    final double simulationProgress = clampDouble(bestCar!.y / bestY, 0, 1);
+    final double simulationProgress =
+        clampDouble(bestCar!.y / bestFitness, 0, 1);
 
     return Stack(
       alignment: Alignment.center,

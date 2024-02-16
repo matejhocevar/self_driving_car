@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
+import '../common/car.dart';
 import '../common/primitives/envelope.dart';
 import '../common/primitives/point.dart';
 import '../common/primitives/polygon.dart';
@@ -12,6 +13,7 @@ import '../common/traffic_light_system.dart';
 import '../utils/math.dart';
 import 'graph.dart';
 import 'markings/marking.dart';
+import 'markings/start.dart';
 import 'markings/traffic_light.dart';
 import 'settings.dart';
 import 'street_furniture/building.dart';
@@ -61,6 +63,10 @@ class World extends CustomPainter {
 
   List<Building> buildings = List.empty(growable: true);
   List<Tree> trees = List.empty(growable: true);
+
+  List<Car> cars = [];
+  Car? bestCar;
+  List<Car> traffic = [];
 
   void dispose() {
     graph.dispose();
@@ -324,7 +330,7 @@ class World extends CustomPainter {
   }
 
   @override
-  void paint(Canvas canvas, Size size) {
+  void paint(Canvas canvas, Size size, {bool showStartMarkings = true}) {
     if (graph.hash != graphHash) {
       generate();
       graphHash = graph.hash;
@@ -344,7 +350,9 @@ class World extends CustomPainter {
 
     // Markings
     for (Marking m in markings) {
-      m.paint(canvas, size);
+      if (m is! Start || showStartMarkings) {
+        m.paint(canvas, size);
+      }
     }
 
     // Road lane
@@ -365,6 +373,15 @@ class World extends CustomPainter {
         color: Colors.white,
         width: VirtualWorldSettings.roadBorderWidth,
       );
+    }
+
+    for (int i = 0; i < traffic.length; i++) {
+      traffic[i].paint(canvas, size);
+    }
+
+    cars.forEach((Car c) => c.paint(canvas, size));
+    if (bestCar != null) {
+      bestCar!.paint(canvas, size);
     }
 
     List<StreetFurniture> streetFurniture = [...buildings, ...trees];

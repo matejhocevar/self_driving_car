@@ -1,6 +1,15 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
+import '../common/constants/vehicles.dart';
+import '../common/controls.dart';
+import '../common/primitives/point.dart';
+import '../common/vehicle.dart';
+
 class VirtualWorldSettings {
+  VirtualWorldSettings._();
+
   // Viewport
   static const double viewportZoomStep = 0.1;
   static const double viewportZoomMin = 1;
@@ -51,4 +60,35 @@ class VirtualWorldSettings {
   static const Color controlsBackgroundColor = Colors.black87;
   static const double controlsMargin = 16;
   static const Radius controlsRadius = Radius.circular(6);
+
+  // Training car
+  static const int trainingCarsN = 1;
+  static const ControlType controlType = ControlType.AI;
+  static Vehicle trainingCarsModel = vehicles[1];
+  static const double trainingCarsOpacity = 0.2;
+  static const double trainingCarsFriction = 0.05;
+  static const double trainingCarsAcceleration = 0.2;
+  static const double trainingCarsSteerAngle = 0.03;
+
+  // Sensor
+  static const bool sensorShowRays = true;
+  static const int sensorRayCount = 5;
+  static const double sensorRayLength = 150;
+  static const double sensorRaySpread = math.pi / 2;
+
+  // Traffic
+  static const List<({int lane, Point location})> trafficLocations = [];
+
+  // Neural Network
+  static const int neuralNetworkLevel1Count = 6;
+  static const int neuralNetworkOutputCount = 4;
+  static const double neuralNetworkMutation = 0.1;
+
+  // Visualisation
+  static const Color visualisationBackgroundColor = Colors.black87;
+  static const double visualisationMargin = 16;
+  static const Radius visualisationRadius = Radius.circular(6);
+  static const Size visualisationNetworkGraphSize = Size(250, 250);
+  static const Size visualisationToolbarSize = Size(250, 36);
+  static const Size visualisationProgressBarSize = Size(250, 4);
 }
