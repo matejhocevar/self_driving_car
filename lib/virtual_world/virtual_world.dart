@@ -345,7 +345,12 @@ class VirtualWorldPainter extends CustomPainter {
     canvas.scale(1 / viewport.zoom, 1 / viewport.zoom);
     Point offset = viewport.getOffset();
     canvas.translate(offset.x, offset.y);
-    world.paint(canvas, size, showStartMarkings: false);
+    world.paint(
+      canvas,
+      size,
+      showStartMarkings: false,
+      renderRadius: VirtualWorldSettings.viewportRenderRadius,
+    );
 
     canvas.restore();
   }

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 
 import 'virtual_world/world_host.dart';
 
 void main() {
-  debugRepaintRainbowEnabled = true;
+  // debugRepaintRainbowEnabled = true;
   runApp(const MainApp());
 }
 

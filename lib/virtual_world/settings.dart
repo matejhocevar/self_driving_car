@@ -14,6 +14,7 @@ class VirtualWorldSettings {
   static const double viewportZoomStep = 0.1;
   static const double viewportZoomMin = 1;
   static const double viewportZoomMax = 5;
+  static const double viewportRenderRadius = 1000;
 
   // Environment
   static const Color surfaceColor = Color(0xff37ae0f);
@@ -62,7 +63,7 @@ class VirtualWorldSettings {
   static const int trafficLightsRedDuration = 1;
 
   // Controls
-  static const Size controlsSize = Size(36, 550);
+  static const Size controlsSize = Size(36, 580);
   static const Color controlsBackgroundColor = Colors.black87;
   static const double controlsMargin = 16;
   static const Radius controlsRadius = Radius.circular(6);

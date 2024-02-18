@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:self_driving_car/virtual_world/virtual_world.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../common/components/osm_dialog.dart';
 import '../common/components/toolbar.dart';
 import '../common/components/toolbar_icon.dart';
 import '../common/constants/vehicles.dart';
@@ -21,6 +22,7 @@ import 'editors/target_editor.dart';
 import 'editors/traffic_light_editor.dart';
 import 'editors/yield_editor.dart';
 import 'graph.dart';
+import 'osm.dart';
 import 'settings.dart';
 import 'world.dart';
 
@@ -63,6 +65,8 @@ class _WorldHostState extends State<WorldHost> {
 
   Timer? timer;
 
+  bool showOSMDialog = false;
+
   @override
   void initState() {
     super.initState();
@@ -101,6 +105,12 @@ class _WorldHostState extends State<WorldHost> {
   }
 
   void _handleScroll(event) {
+    if (event is ScaleUpdateDetails) {
+      world.viewport.handleZoom(Offset(
+        event.horizontalScale,
+        event.verticalScale,
+      ));
+    }
     if (event is PointerScrollEvent) {
       world.viewport.handleZoom(event.scrollDelta);
       setState(() {});
@@ -168,6 +178,26 @@ class _WorldHostState extends State<WorldHost> {
       world.dispose();
       world = newWorld;
     }
+
+    setState(() {
+      loadingStatus = WorldLoadingStatus.loaded;
+    });
+  }
+
+  void _handleOpenOSMDialog() {
+    setState(() {
+      showOSMDialog = true;
+    });
+  }
+
+  Future<void> _handleOSMPaste(String str) async {
+    // Load new model
+    world.dispose();
+
+    Graph graph = await OSM.parse(str, size: size);
+    world = World(graph: graph, viewport: world.viewport);
+
+    print('Successfully loaded world model from OSM data');
 
     setState(() {
       loadingStatus = WorldLoadingStatus.loaded;
@@ -245,15 +275,35 @@ class _WorldHostState extends State<WorldHost> {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            Listener(
-              onPointerSignal: _handleScroll,
-              child: Container(
-                color: Colors.transparent,
-                width: MediaQuery.sizeOf(context).width,
-                height: MediaQuery.sizeOf(context).height,
-                child: worldModeWidget,
+            GestureDetector(
+              onScaleUpdate: _handleScroll,
+              child: Listener(
+                onPointerSignal: _handleScroll,
+                child: Container(
+                  color: Colors.transparent,
+                  width: MediaQuery.sizeOf(context).width,
+                  height: MediaQuery.sizeOf(context).height,
+                  child: worldModeWidget,
+                ),
               ),
             ),
+            if (showOSMDialog)
+              Positioned(
+                top: 0,
+                left: 0,
+                child: OSMDialog(
+                  onDismiss: () => setState(() {
+                    showOSMDialog = false;
+                  }),
+                  onSubmit: (String str) async {
+                    setState(() {
+                      showOSMDialog = false;
+                      loadingStatus = WorldLoadingStatus.loading;
+                    });
+                    await _handleOSMPaste(str);
+                  },
+                ),
+              ),
             Positioned(
               left: VirtualWorldSettings.controlsMargin,
               child: Center(
@@ -329,6 +379,12 @@ class _WorldHostState extends State<WorldHost> {
                       tooltip: 'Load world',
                       isActive: loadingStatus == WorldLoadingStatus.loading,
                       onTap: _handleLoadWorld,
+                    ),
+                    ToolbarIcon(
+                      icon: Icons.code_outlined,
+                      tooltip: 'Paste OSM data',
+                      isActive: loadingStatus == WorldLoadingStatus.loading,
+                      onTap: _handleOpenOSMDialog,
                     ),
                     ToolbarIcon(
                       icon: Icons.delete_forever,

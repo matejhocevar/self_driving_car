@@ -7,10 +7,11 @@ import '../../utils/math.dart';
 import 'point.dart';
 
 class Segment extends CustomPainter {
-  Segment(this.p1, this.p2);
+  Segment(this.p1, this.p2, {this.oneWay = false});
 
   Point p1;
   Point p2;
+  bool oneWay;
 
   (Point, Point) get points => (p1, p2);
 
@@ -62,6 +63,10 @@ class Segment extends CustomPainter {
       ..color = color
       ..strokeWidth = width
       ..strokeCap = strokeCap;
+
+    if (oneWay) {
+      dash = [4, 4];
+    }
 
     if (dash.isNotEmpty) {
       final [int dashSpace, int dashWidth] = dash;

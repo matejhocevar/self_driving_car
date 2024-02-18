@@ -7,6 +7,7 @@ class Point extends CustomPainter {
 
   double x;
   double y;
+  int? id;
 
   Point.fromOffset(Offset o)
       : x = o.dx,

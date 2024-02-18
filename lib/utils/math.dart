@@ -17,6 +17,14 @@ Point lerp2D(Point a, Point b, double t) {
   );
 }
 
+double invLerp(double a, double b, double v) {
+  return (v - a) / (b - a);
+}
+
+double degToRad(degree) {
+  return degree * math.pi / 180;
+}
+
 Position? getIntersection(Offset a, Offset b, Offset c, Offset d) {
   final tTop = (d.dx - c.dx) * (a.dy - c.dy) - (d.dy - c.dy) * (a.dx - c.dx);
   final uTop = (c.dy - a.dy) * (a.dx - b.dx) - (c.dx - a.dx) * (a.dy - b.dy);

@@ -74,16 +74,21 @@ class World extends CustomPainter {
   }
 
   void generate() {
+    print('Generating envelopes...');
     envelopes.length = 0;
     for (Segment s in graph.segments) {
       envelopes.add(Envelope(s, width: roadWidth, roundness: roadRoundness));
     }
 
+    print('Calculating road borders...');
     roadBorders = Polygon.union(envelopes.map((e) => e.polygon).toList());
 
+    print('Generating buildings...');
     buildings = _generateBuildings();
+    print('Generating trees...');
     trees = _generateTrees();
 
+    print('Generating guide lanes...');
     laneGuides.length = 0;
     laneGuides = _generateLaneGuides();
   }
@@ -330,7 +335,12 @@ class World extends CustomPainter {
   }
 
   @override
-  void paint(Canvas canvas, Size size, {bool showStartMarkings = true}) {
+  void paint(
+    Canvas canvas,
+    Size size, {
+    bool showStartMarkings = true,
+    double renderRadius = 1000,
+  }) {
     if (graph.hash != graphHash) {
       generate();
       graphHash = graph.hash;
@@ -384,7 +394,11 @@ class World extends CustomPainter {
       bestCar!.paint(canvas, size);
     }
 
-    List<StreetFurniture> streetFurniture = [...buildings, ...trees];
+    List<StreetFurniture> streetFurniture =
+        List<StreetFurniture>.from([...buildings, ...trees])
+            .where((StreetFurniture sf) =>
+                sf.base.distanceToPoint(viewPoint) < renderRadius)
+            .toList();
     streetFurniture.sort((a, b) => b.base
         .distanceToPoint(viewPoint)
         .compareTo(a.base.distanceToPoint(viewPoint)));
