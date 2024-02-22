@@ -42,6 +42,10 @@ class _MarkingEditorState extends State<MarkingEditor> {
   late Graph graph;
   late ViewPort viewport;
 
+  bool isDragging = false;
+
+  Point? selected;
+  Point? hovered;
   Point? mouse;
   Marking? intent;
 
@@ -85,6 +89,40 @@ class _MarkingEditorState extends State<MarkingEditor> {
     }
   }
 
+  void _handleDragStart(drag) {
+    isDragging = true;
+    if (selected != hovered) {
+      selected = hovered;
+    }
+
+    viewport.handlePanStart(Point.fromOffset(drag.localPosition));
+    setState(() {});
+  }
+
+  void _handleDragUpdate(drag) {
+    if (isDragging && selected != null) {
+      Point p = viewport.getMouse(
+        Point.fromOffset(drag.localPosition),
+        subtractDragOffset: true,
+      );
+      selected!.x = p.x;
+      selected!.y = p.y;
+    } else {
+      viewport.handlePanUpdate(Point.fromOffset(drag.localPosition));
+    }
+
+    setState(() {});
+  }
+
+  void _handleDragEnd(_) {
+    isDragging = false;
+    if (selected != null) {
+      selected = null;
+    }
+    viewport.handlePanEnd();
+    setState(() {});
+  }
+
   void _handleSecondaryTapDown(_) {
     for (int i = 0; i < widget.markings.length; i++) {
       Polygon p = widget.markings[i].polygon;
@@ -102,6 +140,9 @@ class _MarkingEditorState extends State<MarkingEditor> {
       onHover: _handleHover,
       child: GestureDetector(
         onTapDown: _handleTapDown,
+        onPanStart: _handleDragStart,
+        onPanUpdate: _handleDragUpdate,
+        onPanEnd: _handleDragEnd,
         onSecondaryTapDown: _handleSecondaryTapDown,
         child: CustomPaint(
           painter: MarkingEditorPainter(
