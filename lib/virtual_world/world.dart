@@ -91,6 +91,8 @@ class World extends CustomPainter {
     print('Generating guide lanes...');
     laneGuides.length = 0;
     laneGuides = _generateLaneGuides();
+
+    print('Generation completed!');
   }
 
   List<Building> _generateBuildings() {

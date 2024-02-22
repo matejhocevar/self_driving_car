@@ -98,4 +98,17 @@ class VirtualWorldSettings {
   static const Size visualisationNetworkGraphSize = Size(250, 250);
   static const Size visualisationToolbarSize = Size(250, 36);
   static const Size visualisationProgressBarSize = Size(250, 4);
+
+  // Minimap
+  static const double minimapRadius = 250;
+  static const Color minimapBorderColor = Colors.black87;
+  static const double minimapBorderWidth = 10;
+  static const Color minimapRoadColor = Colors.black87;
+  static const double minimapRoadWidthFactor = 4;
+  static const Color minimapCarIndicatorColor = Colors.blue;
+  static const bool minimapCarIndicatorOutline = true;
+  static const double minimapCarIndicatorRadius = 6;
+  static const double minimapScalerDefault = 0.05;
+  static const double minimapScalerIncreaseFactor = 0.5;
+  static const double minimapScalerDecreaseFactor = 2;
 }

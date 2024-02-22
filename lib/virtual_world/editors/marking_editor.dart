@@ -138,7 +138,7 @@ class MarkingEditorPainter extends CustomPainter {
     Point offset = viewport.getOffset();
     canvas.translate(offset.x, offset.y);
 
-    world.paint(canvas, size);
+    world.paint(canvas, size, renderRadius: double.infinity);
     world.graph.paint(canvas, size);
 
     intent?.paint(canvas, size);

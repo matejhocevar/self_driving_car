@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:self_driving_car/virtual_world/virtual_world.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../common/components/minimap.dart';
 import '../common/components/osm_dialog.dart';
 import '../common/components/toolbar.dart';
 import '../common/components/toolbar_icon.dart';
@@ -394,6 +395,15 @@ class _WorldHostState extends State<WorldHost> {
                     ),
                   ],
                 ),
+              ),
+            ),
+            Positioned(
+              right: 16 + VirtualWorldSettings.minimapBorderWidth,
+              bottom: 16 + VirtualWorldSettings.minimapBorderWidth,
+              child: MiniMap(
+                world: world,
+                radius: VirtualWorldSettings.minimapRadius -
+                    VirtualWorldSettings.minimapBorderWidth * 2,
               ),
             ),
           ],
