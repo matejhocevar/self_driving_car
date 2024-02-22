@@ -12,6 +12,7 @@ class Building extends CustomPainter implements StreetFurniture {
   Building(
     this.polygon, {
     this.height = 120,
+    this.hasRoof = true,
     this.sideColor = const Color(0xffffffff),
     this.sideBorderColor = const Color(0xffaaaaaa),
     this.roofColor = const Color(0xffd44444),
@@ -22,6 +23,7 @@ class Building extends CustomPainter implements StreetFurniture {
 
   final Polygon polygon;
   final double height;
+  final bool hasRoof;
   final Color sideColor;
   final Color sideBorderColor;
   final Color roofColor;
@@ -49,7 +51,8 @@ class Building extends CustomPainter implements StreetFurniture {
     for (int i = 0; i < base.points.length; i++) {
       int nextI = (i + 1) % base.points.length;
       Polygon side = Polygon(
-          [base.points[i], base.points[nextI], topPoints[nextI], topPoints[i]]);
+        [base.points[i], base.points[nextI], topPoints[nextI], topPoints[i]],
+      );
       sides.add(side);
     }
 
@@ -58,33 +61,37 @@ class Building extends CustomPainter implements StreetFurniture {
           b.distanceToPoint(viewPoint!).compareTo(a.distanceToPoint(viewPoint)),
     );
 
-    // Roof
-    List<Point> baseMidpoints = [
-      average(base.points[0], base.points[1]),
-      average(base.points[2], base.points[3]),
-    ];
+    List<Polygon> roofPolygons = [];
+    if (hasRoof) {
+      // Roof
+      List<Point> baseMidpoints = [
+        average(base.points[0], base.points[1]),
+        average(base.points[2], base.points[3]),
+      ];
 
-    List<Point> topMidpoints = baseMidpoints
-        .map((p) => getFake3DPoint(p, viewPoint!, height))
-        .toList();
+      List<Point> topMidpoints = baseMidpoints
+          .map((p) => getFake3DPoint(p, viewPoint!, height))
+          .toList();
 
-    List<Polygon> roofPolygons = [
-      Polygon([
-        ceiling.points[0],
-        ceiling.points[3],
-        topMidpoints[1],
-        topMidpoints[0],
-      ]),
-      Polygon([
-        ceiling.points[2],
-        ceiling.points[1],
-        topMidpoints[0],
-        topMidpoints[1],
-      ]),
-    ];
+      roofPolygons = [
+        Polygon([
+          ceiling.points[0],
+          ceiling.points[3],
+          topMidpoints[1],
+          topMidpoints[0],
+        ]),
+        Polygon([
+          ceiling.points[2],
+          ceiling.points[1],
+          topMidpoints[0],
+          topMidpoints[1],
+        ]),
+      ];
 
-    roofPolygons.sort((a, b) =>
-        b.distanceToPoint(viewPoint!).compareTo(a.distanceToPoint(viewPoint)));
+      roofPolygons.sort((a, b) => b
+          .distanceToPoint(viewPoint!)
+          .compareTo(a.distanceToPoint(viewPoint)));
+    }
 
     base.paint(
       canvas,
@@ -108,7 +115,7 @@ class Building extends CustomPainter implements StreetFurniture {
       size,
       fill: sideColor,
       stroke: sideBorderColor,
-      lineWidth: 6,
+      lineWidth: hasRoof ? 6 : 0,
     );
 
     for (Polygon roof in roofPolygons) {

@@ -32,6 +32,7 @@ class World extends CustomPainter {
     double? spacing,
     double? treeSize,
     int? treeTryCount,
+    this.regenerateBuildings = true,
     this.graphHash,
   }) {
     this.roadWidth = roadWidth ?? VirtualWorldSettings.roadWidth;
@@ -50,6 +51,7 @@ class World extends CustomPainter {
   late final double roadWidth;
   late final int roadRoundness;
 
+  bool regenerateBuildings;
   late final double buildingWidth;
   late final double buildingMinLength;
   late final double spacing;
@@ -71,6 +73,8 @@ class World extends CustomPainter {
   void dispose() {
     graph.dispose();
     markings.length = 0;
+    buildings.length = 0;
+    trees.length = 0;
   }
 
   void generate() {
@@ -83,8 +87,11 @@ class World extends CustomPainter {
     print('Calculating road borders...');
     roadBorders = Polygon.union(envelopes.map((e) => e.polygon).toList());
 
-    print('Generating buildings...');
-    buildings = _generateBuildings();
+    if (regenerateBuildings) {
+      print('Generating buildings...');
+      buildings = _generateBuildings();
+    }
+
     print('Generating trees...');
     trees = _generateTrees();
 

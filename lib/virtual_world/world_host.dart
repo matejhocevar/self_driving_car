@@ -194,9 +194,7 @@ class _WorldHostState extends State<WorldHost> {
   Future<void> _handleOSMPaste(String str) async {
     // Load new model
     world.dispose();
-
-    Graph graph = await OSM.parse(str, size: size);
-    world = World(graph: graph, viewport: world.viewport);
+    world = await OSM.parse(str, viewport: world.viewport);
 
     print('Successfully loaded world model from OSM data');
 
