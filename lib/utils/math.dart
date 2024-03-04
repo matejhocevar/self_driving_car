@@ -158,3 +158,22 @@ Point getFake3DPoint(Point p, Point viewPoint, double height) {
   double scaler = math.atan(dist / 300) / (math.pi / 2);
   return add(p, scale(dir, height * scaler));
 }
+
+Point calculateCentroid(List<Point> points) {
+  if (points.isEmpty) {
+    return Point(0, 0);
+  }
+
+  double totalX = 0;
+  double totalY = 0;
+
+  for (Point point in points) {
+    totalX += point.x;
+    totalY += point.y;
+  }
+
+  double centroidX = totalX / points.length;
+  double centroidY = totalY / points.length;
+
+  return Point(centroidX, centroidY);
+}
