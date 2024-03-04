@@ -13,7 +13,7 @@ import '../common/constants/vehicles.dart';
 import '../common/controls.dart';
 import '../common/sensor.dart';
 import '../common/vehicle.dart';
-import '../network/neural_network.dart';
+import '../neural_network/neural_network.dart';
 import 'road.dart';
 import 'settings.dart';
 

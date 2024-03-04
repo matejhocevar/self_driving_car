@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../infinity_road/settings.dart';
-import '../../network/level.dart';
-import '../../network/neural_network.dart';
+import '../../neural_network/level.dart';
+import '../../neural_network/neural_network.dart';
 import '../../utils/color.dart';
 import '../../utils/math.dart';
 

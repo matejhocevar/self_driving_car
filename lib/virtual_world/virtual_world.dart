@@ -14,7 +14,7 @@ import '../common/controls.dart';
 import '../common/primitives/point.dart';
 import '../common/sensor.dart';
 import '../common/vehicle.dart';
-import '../network/neural_network.dart';
+import '../neural_network/neural_network.dart';
 import '../utils/math.dart';
 import 'graph.dart';
 import 'markings/start.dart';
@@ -95,7 +95,7 @@ class _VirtualWorldState extends State<VirtualWorld>
     Point direction = startMarking?.directionVector ?? Point(0, -1);
 
     String carProperties = await rootBundle
-        .loadString('assets/network/saves/right_hand_rule.json');
+        .loadString('assets/neural_network/saves/right_hand_rule.json');
 
     for (int i = 0; i < n; i++) {
       Vehicle v = VirtualWorldSettings.trainingCarsModel;

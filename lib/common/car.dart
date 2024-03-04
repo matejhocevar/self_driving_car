@@ -4,7 +4,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../infinity_road/settings.dart';
-import '../network/neural_network.dart';
+import '../neural_network/neural_network.dart';
 import '../utils/math.dart';
 import 'controls.dart';
 import 'primitives/position.dart';
