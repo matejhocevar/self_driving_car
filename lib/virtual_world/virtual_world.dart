@@ -146,13 +146,15 @@ class _VirtualWorldState extends State<VirtualWorld>
     return traffic;
   }
 
-  void _selectTheBestCar() {
+  double _selectTheBestCar() {
     bestCar!.showSensor = false;
     bestCar!.vehicleOpacity = VirtualWorldSettings.trainingCarsOpacity;
     double maxFitness = cars.map((Car car) => car.fitness).reduce(math.max);
     bestCar = cars.firstWhere((Car c) => c.fitness == maxFitness);
     bestCar!.showSensor = true;
     bestCar!.vehicleOpacity = 1;
+
+    return maxFitness;
   }
 
   void _onUpdateListener() {
@@ -160,7 +162,7 @@ class _VirtualWorldState extends State<VirtualWorld>
       cars.forEach((Car c) {
         c.update(roadBorders, traffic);
       });
-      _selectTheBestCar();
+      double maxFitness = _selectTheBestCar();
       traffic.forEach((Car c) => c.update(roadBorders, []));
 
       viewport.offset.x = -bestCar!.x;
@@ -169,6 +171,11 @@ class _VirtualWorldState extends State<VirtualWorld>
       world.cars = cars;
       world.traffic = traffic;
       world.bestCar = bestCar;
+
+      // Damage cars that are lagging too far behind
+      cars
+          .where((Car c) => (c.fitness - maxFitness).abs() > 500)
+          .forEach((Car c) => c.damaged = true);
     });
   }
 
