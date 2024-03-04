@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -17,6 +18,8 @@ class Car extends CustomPainter {
     required this.width,
     required this.height,
     this.maxSpeed = 3,
+    double? friction,
+    double? acceleration,
     this.controlType = ControlType.dummy,
     this.speed = 0,
     this.angle = 0,
@@ -43,6 +46,10 @@ class Car extends CustomPainter {
 
     polygon = _createPolygon();
     controls = Controls(type: controlType);
+
+    this.friction = friction ?? InfinityRoadSettings.trainingCarsFriction;
+    this.acceleration =
+        acceleration ?? InfinityRoadSettings.trainingCarsAcceleration;
   }
 
   double x;
@@ -52,13 +59,12 @@ class Car extends CustomPainter {
   double speed;
   double angle;
   double maxSpeed;
+  late double friction;
+  late double acceleration;
 
   Vehicle? vehicle;
   double vehicleOpacity;
 
-  static const double friction = InfinityRoadSettings.trainingCarsFriction;
-  static const double acceleration =
-      InfinityRoadSettings.trainingCarsAcceleration;
   static const double steerAngle = InfinityRoadSettings.trainingCarsSteerAngle;
   bool damaged = false;
 
@@ -84,9 +90,14 @@ class Car extends CustomPainter {
 
     if (controlType != ControlType.dummy) {
       sensor.update(roadBorders, traffic);
+
+      // Set distance sensors
       List<double> offsets = sensor.readings
           .map((Position? p) => p?.offset == null ? 0.0 : 1 - p!.offset)
           .toList();
+      // Set normalized speed
+      offsets.add(speed / maxSpeed);
+
       List<double> outputs = NeuralNetwork.feedForward(offsets, brain!);
 
       if (useBrain) {
@@ -123,10 +134,10 @@ class Car extends CustomPainter {
 
   void _move() {
     if (controls.forward) {
-      speed += Car.acceleration;
+      speed += acceleration;
     }
     if (controls.reverse) {
-      speed -= Car.acceleration;
+      speed -= acceleration;
     }
 
     if (speed > maxSpeed) {
@@ -138,11 +149,11 @@ class Car extends CustomPainter {
     }
 
     if (speed > 0) {
-      speed -= Car.friction;
+      speed -= friction;
     }
 
     if (speed < 0) {
-      speed += Car.friction;
+      speed += friction;
     }
 
     if (speed != 0) {
@@ -223,6 +234,16 @@ class Car extends CustomPainter {
 
   @override
   int get hashCode => Object.hash(x, y, width, height, controls);
+
+  void updateFromString(String str) {
+    final data = jsonDecode(str);
+
+    brain = NeuralNetwork.fromString(json.encode(data['brain']));
+    maxSpeed = data['maxSpeed'];
+    friction = data['friction'];
+    acceleration = data['acceleration'];
+    sensor = Sensor.fromJson(this, data['sensor']);
+  }
 
   @override
   String toString() {

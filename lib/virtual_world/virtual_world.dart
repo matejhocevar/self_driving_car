@@ -94,21 +94,26 @@ class _VirtualWorldState extends State<VirtualWorld>
     Point startingPoint = startMarking?.center ?? Point(100, 100);
     Point direction = startMarking?.directionVector ?? Point(0, -1);
 
+    String carProperties = await rootBundle
+        .loadString('assets/network/saves/right_hand_rule.json');
+
     for (int i = 0; i < n; i++) {
       Vehicle v = VirtualWorldSettings.trainingCarsModel;
-      cars.add(
-        Car(
-          x: startingPoint.x,
-          y: startingPoint.y,
-          angle: -angle(direction) + math.pi / 2,
-          width: v.size.width,
-          height: v.size.height,
-          brain: await _loadModel(),
-          controlType: VirtualWorldSettings.controlType,
-          vehicle: v,
-          vehicleOpacity: VirtualWorldSettings.trainingCarsOpacity,
-        ),
+
+      Car car = Car(
+        x: startingPoint.x,
+        y: startingPoint.y,
+        angle: -angle(direction) + math.pi / 2,
+        width: v.size.width,
+        height: v.size.height,
+        brain: await _loadModel(),
+        controlType: VirtualWorldSettings.controlType,
+        vehicle: v,
+        vehicleOpacity: VirtualWorldSettings.trainingCarsOpacity,
       );
+      car.updateFromString(carProperties);
+
+      cars.add(car);
 
       if (i != 0) {
         NeuralNetwork.mutate(

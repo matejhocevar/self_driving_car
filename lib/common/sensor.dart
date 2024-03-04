@@ -12,12 +12,14 @@ class Sensor extends CustomPainter {
     this.rayCount = 3,
     this.rayLength = 100,
     this.raySpread = math.pi / 4,
+    this.rayOffset = 0,
   });
 
   final Car car;
   final int rayCount;
   final double rayLength;
   final double raySpread;
+  final double rayOffset;
 
   List<List<Offset>> rays = [];
   List<Position?> readings = [];
@@ -41,7 +43,8 @@ class Sensor extends CustomPainter {
             -raySpread / 2,
             rayCount == 1 ? 0.5 : i / (rayCount - 1),
           ) +
-          car.angle;
+          car.angle +
+          rayOffset;
 
       var start = Offset(car.x, car.y);
       var end = Offset(
@@ -116,5 +119,15 @@ class Sensor extends CustomPainter {
   @override
   bool shouldRepaint(covariant Sensor oldDelegate) {
     return true;
+  }
+
+  static Sensor fromJson(Car car, Map<String, dynamic> json) {
+    return Sensor(
+      car: car,
+      rayCount: json['rayCount'],
+      rayLength: json['rayLength'],
+      raySpread: json['raySpread'],
+      rayOffset: json['rayOffset'],
+    );
   }
 }

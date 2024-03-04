@@ -22,4 +22,5 @@ flutter:
   uses-material-design: true
 
   assets:
+    - assets/network/saves/
     - assets/vehicles/

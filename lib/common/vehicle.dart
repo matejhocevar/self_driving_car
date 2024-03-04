@@ -17,7 +17,7 @@ enum VehicleType {
   truck,
 }
 
-const double vehicleScale = 1.5;
+const double vehicleScale = 1.2;
 
 class Vehicle {
   Vehicle({
