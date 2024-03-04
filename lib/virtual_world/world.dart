@@ -76,6 +76,7 @@ class World extends CustomPainter {
     markings.length = 0;
     buildings.length = 0;
     trees.length = 0;
+    rivers.length = 0;
   }
 
   void generate() {
