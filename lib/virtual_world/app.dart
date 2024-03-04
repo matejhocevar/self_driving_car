@@ -47,14 +47,14 @@ enum WorldLoadingStatus {
   disposing,
 }
 
-class WorldHost extends StatefulWidget {
-  const WorldHost({super.key});
+class App extends StatefulWidget {
+  const App({super.key});
 
   @override
-  State<WorldHost> createState() => _WorldHostState();
+  State<App> createState() => _AppState();
 }
 
-class _WorldHostState extends State<WorldHost> {
+class _AppState extends State<App> {
   late final SharedPreferences prefs;
 
   late World world;

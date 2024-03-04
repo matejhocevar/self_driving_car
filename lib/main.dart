@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'virtual_world/world_host.dart';
+import 'virtual_world/app.dart';
 
 void main() {
   // debugRepaintRainbowEnabled = true;
@@ -18,7 +18,7 @@ class MainApp extends StatelessWidget {
       home: Material(
         child: Container(
           color: Colors.grey,
-          child: const WorldHost(),
+          child: const App(),
         ),
       ),
     );
