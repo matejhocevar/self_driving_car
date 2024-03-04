@@ -24,7 +24,7 @@ class OSM {
       List roadWays = [];
       List buildingWays = [];
       for (var el in json['elements'] as List<dynamic>) {
-        if (el['type'] == 'way') {
+        if (el['type'] == 'way' && el['tags'] != null) {
           if ((el['tags'] as Map<String, dynamic>).containsKey('highway')) {
             roadWays.add(el);
           }
@@ -97,6 +97,10 @@ class OSM {
                 way['tags']?['lanes'] == 1;
         segments.add(Segment(prev, curr, oneWay: oneWay));
         points.add(prev);
+
+        if (i == ids.length - 1) {
+          points.add(curr);
+        }
       }
     }
 
