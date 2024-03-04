@@ -97,15 +97,15 @@ class Segment extends CustomPainter {
   @override
   int get hashCode => Object.hash(p1, p2);
 
-  List<double> toJSON() {
-    return [p1.x, p1.y, p2.x, p2.y];
+  List<dynamic> toJSON() {
+    return [p1.x, p1.y, p2.x, p2.y, oneWay];
   }
 
   static Segment load(
     List<dynamic> rawSegment, {
     List<Point> points = const [],
   }) {
-    final [p1x, p1y, p2x, p2y] = List<double>.from(rawSegment);
+    final [p1x, p1y, p2x, p2y, bool? oneWay] = List<dynamic>.from(rawSegment);
     late Point p1;
     late Point p2;
     if (points.isNotEmpty) {
@@ -115,6 +115,6 @@ class Segment extends CustomPainter {
       p1 = Point(p1x, p1y);
       p2 = Point(p2x, p2y);
     }
-    return Segment(p1, p2);
+    return Segment(p1, p2, oneWay: oneWay ?? false);
   }
 }
