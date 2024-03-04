@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math' as math;
 
+import 'package:self_driving_car/common/primitives/envelope.dart';
 import 'package:self_driving_car/virtual_world/settings.dart';
 
 import '../common/primitives/point.dart';
@@ -25,6 +26,7 @@ class OSM {
       // Filter ways
       List roadWays = [];
       List buildingWays = [];
+      List riverWays = [];
       for (var el in json['elements'] as List<dynamic>) {
         if (el['type'] == 'way' && el['tags'] != null) {
           if ((el['tags'] as Map<String, dynamic>).containsKey('highway')) {
@@ -33,6 +35,10 @@ class OSM {
 
           if ((el['tags'] as Map<String, dynamic>).containsKey('building')) {
             buildingWays.add(el);
+          }
+
+          if ((el['tags'] as Map<String, dynamic>).containsKey('waterway')) {
+            riverWays.add(el);
           }
         }
       }
@@ -69,6 +75,7 @@ class OSM {
       // Parse roads & buildings
       final (points, segments) = _parseRoads(allPoints, roadWays);
       final List<Building> buildings = _parseBuildings(allPoints, buildingWays);
+      final List<Envelope> rivers = _parseRivers(allPoints, riverWays);
 
       viewport.offset = scale(calculateCentroid(allPoints), -1);
       viewport.zoom = VirtualWorldSettings.viewportZoomMax;
@@ -77,7 +84,9 @@ class OSM {
         graph: Graph(points: points, segments: segments),
         viewport: viewport,
         regenerateBuildings: false,
-      )..buildings = buildings;
+      )
+        ..buildings = buildings
+        ..rivers = rivers;
     } catch (e, stackTrace) {
       print('Failed to parse OSM data. Check your input');
       print(e);
@@ -127,5 +136,27 @@ class OSM {
     }
 
     return buildings;
+  }
+
+  static List<Envelope> _parseRivers(List<Point> allPoints, List ways) {
+    List<Envelope> envelopes = [];
+
+    for (var way in ways) {
+      final ids = way['nodes'];
+      for (int i = 1; i < ids.length; i++) {
+        Point prev = allPoints.firstWhere((p) => p.id == ids[i - 1]);
+        Point curr = allPoints.firstWhere((p) => p.id == ids[i]);
+        Segment s = Segment(prev, curr, oneWay: true);
+        envelopes.add(
+          Envelope(
+            s,
+            width: VirtualWorldSettings.riverWidth,
+            roundness: VirtualWorldSettings.riverRoundness,
+          ),
+        );
+      }
+    }
+
+    return envelopes;
   }
 }

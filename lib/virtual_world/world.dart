@@ -65,6 +65,7 @@ class World extends CustomPainter {
 
   List<Building> buildings = List.empty(growable: true);
   List<Tree> trees = List.empty(growable: true);
+  List<Envelope> rivers = List.empty(growable: true);
 
   List<Car> cars = [];
   Car? bestCar;
@@ -356,6 +357,16 @@ class World extends CustomPainter {
     }
 
     final viewPoint = scale(viewport.getOffset(), -1);
+
+    // Rivers
+    for (Envelope e in rivers) {
+      e.paint(
+        canvas,
+        size,
+        fill: VirtualWorldSettings.riverColor,
+        lineWidth: VirtualWorldSettings.riverMargin,
+      );
+    }
 
     // Road envelope
     for (Envelope e in envelopes) {

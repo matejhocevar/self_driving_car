@@ -43,6 +43,12 @@ class VirtualWorldSettings {
   static const double treeHeight = 200;
   static const int treeLayers = 7;
 
+  // Rivers
+  static const double riverWidth = 100;
+  static const double riverMargin = 15;
+  static const int riverRoundness = 10;
+  static const Color riverColor = Color(0xff4682B4);
+
   // Editors
   static const Color editorBlueprintColor = Color(0xff2168e8);
   static const double editorBlueprintGridSize = 100;

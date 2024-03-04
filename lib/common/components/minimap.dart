@@ -3,6 +3,7 @@ import 'package:self_driving_car/virtual_world/settings.dart';
 
 import '../../utils/math.dart';
 import '../../virtual_world/world.dart';
+import '../primitives/envelope.dart';
 import '../primitives/point.dart';
 import '../primitives/segment.dart';
 import 'circle_button.dart';
@@ -114,6 +115,17 @@ class MiniMapPainter extends CustomPainter {
     );
     canvas.scale(scaler, scaler);
 
+    // Rivers
+    for (Envelope e in world.rivers) {
+      e.paint(
+        canvas,
+        size,
+        fill: VirtualWorldSettings.riverColor,
+        lineWidth: VirtualWorldSettings.riverMargin,
+      );
+    }
+
+    // Roads
     for (Segment s in world.graph.segments) {
       s.paint(
         canvas,
