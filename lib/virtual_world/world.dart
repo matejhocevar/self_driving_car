@@ -66,6 +66,7 @@ class World extends CustomPainter {
   List<Building> buildings = List.empty(growable: true);
   List<Tree> trees = List.empty(growable: true);
   List<Envelope> rivers = List.empty(growable: true);
+  List<Polygon> seaAndLakes = List.empty(growable: true);
 
   List<Car> cars = [];
   Car? bestCar;
@@ -77,6 +78,7 @@ class World extends CustomPainter {
     buildings.length = 0;
     trees.length = 0;
     rivers.length = 0;
+    seaAndLakes.length = 0;
   }
 
   void generate() {
@@ -366,6 +368,16 @@ class World extends CustomPainter {
         size,
         fill: VirtualWorldSettings.riverColor,
         lineWidth: VirtualWorldSettings.riverMargin,
+      );
+    }
+
+    // Sea and lakes
+    for (Polygon p in seaAndLakes) {
+      p.paint(
+        canvas,
+        size,
+        fill: VirtualWorldSettings.seaAndLakesColor,
+        lineWidth: VirtualWorldSettings.seaAndLakesMargin,
       );
     }
 

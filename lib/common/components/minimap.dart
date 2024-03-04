@@ -5,6 +5,7 @@ import '../../utils/math.dart';
 import '../../virtual_world/world.dart';
 import '../primitives/envelope.dart';
 import '../primitives/point.dart';
+import '../primitives/polygon.dart';
 import '../primitives/segment.dart';
 import 'circle_button.dart';
 
@@ -118,6 +119,16 @@ class MiniMapPainter extends CustomPainter {
     // Rivers
     for (Envelope e in world.rivers) {
       e.paint(
+        canvas,
+        size,
+        fill: VirtualWorldSettings.riverColor,
+        lineWidth: VirtualWorldSettings.riverMargin,
+      );
+    }
+
+    // Sea and lakes
+    for (Polygon p in world.seaAndLakes) {
+      p.paint(
         canvas,
         size,
         fill: VirtualWorldSettings.riverColor,

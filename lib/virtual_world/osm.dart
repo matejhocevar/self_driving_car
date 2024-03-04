@@ -27,6 +27,7 @@ class OSM {
       List roadWays = [];
       List buildingWays = [];
       List riverWays = [];
+      List seaAndLakesWays = [];
       for (var el in json['elements'] as List<dynamic>) {
         if (el['type'] == 'way' && el['tags'] != null) {
           if ((el['tags'] as Map<String, dynamic>).containsKey('highway')) {
@@ -39,6 +40,12 @@ class OSM {
 
           if ((el['tags'] as Map<String, dynamic>).containsKey('waterway')) {
             riverWays.add(el);
+          }
+
+          if ((el['tags'] as Map<String, dynamic>).containsKey('natural')) {
+            if (el['tags']['natural'] == 'water') {
+              seaAndLakesWays.add(el);
+            }
           }
         }
       }
@@ -76,6 +83,8 @@ class OSM {
       final (points, segments) = _parseRoads(allPoints, roadWays);
       final List<Building> buildings = _parseBuildings(allPoints, buildingWays);
       final List<Envelope> rivers = _parseRivers(allPoints, riverWays);
+      final List<Polygon> seaAndLakes =
+          _parseSeaAndLakes(allPoints, seaAndLakesWays);
 
       viewport.offset = scale(calculateCentroid(allPoints), -1);
       viewport.zoom = VirtualWorldSettings.viewportZoomMax;
@@ -86,7 +95,8 @@ class OSM {
         regenerateBuildings: false,
       )
         ..buildings = buildings
-        ..rivers = rivers;
+        ..rivers = rivers
+        ..seaAndLakes = seaAndLakes;
     } catch (e, stackTrace) {
       print('Failed to parse OSM data. Check your input');
       print(e);
@@ -158,5 +168,22 @@ class OSM {
     }
 
     return envelopes;
+  }
+
+  static List<Polygon> _parseSeaAndLakes(List<Point> allPoints, List ways) {
+    List<Polygon> polygons = [];
+
+    for (var way in ways) {
+      final ids = way['nodes'];
+      List<Point> points = [];
+      for (int i = 0; i < ids.length; i++) {
+        Point p = allPoints.firstWhere((p) => p.id == ids[i]);
+        points.add(p);
+      }
+
+      polygons.add(Polygon(points));
+    }
+
+    return polygons;
   }
 }

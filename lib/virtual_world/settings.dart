@@ -49,6 +49,10 @@ class VirtualWorldSettings {
   static const int riverRoundness = 10;
   static const Color riverColor = Color(0xff4682B4);
 
+  // Sea and lakes
+  static const double seaAndLakesMargin = 15;
+  static const Color seaAndLakesColor = Color(0xff4682B4);
+
   // Editors
   static const Color editorBlueprintColor = Color(0xff2168e8);
   static const double editorBlueprintGridSize = 100;
