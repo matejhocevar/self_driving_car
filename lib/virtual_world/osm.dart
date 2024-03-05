@@ -10,6 +10,8 @@ import '../common/primitives/segment.dart';
 import '../utils/math.dart';
 import 'graph.dart';
 import 'street_furniture/building.dart';
+import 'street_furniture/land.dart';
+import 'street_furniture/tree.dart';
 import 'viewport.dart';
 import 'world.dart';
 
@@ -27,7 +29,7 @@ class OSM {
       List roadWays = [];
       List buildingWays = [];
       List riverWays = [];
-      List seaAndLakesWays = [];
+      List landsWays = [];
       for (var el in json['elements'] as List<dynamic>) {
         if (el['type'] == 'way' && el['tags'] != null) {
           if ((el['tags'] as Map<String, dynamic>).containsKey('highway')) {
@@ -42,10 +44,9 @@ class OSM {
             riverWays.add(el);
           }
 
-          if ((el['tags'] as Map<String, dynamic>).containsKey('natural')) {
-            if (el['tags']['natural'] == 'water') {
-              seaAndLakesWays.add(el);
-            }
+          if ((el['tags'] as Map<String, dynamic>).containsKey('natural') ||
+              el['tags'].containsKey('landuse')) {
+            landsWays.add(el);
           }
         }
       }
@@ -83,20 +84,36 @@ class OSM {
       final (points, segments) = _parseRoads(allPoints, roadWays);
       final List<Building> buildings = _parseBuildings(allPoints, buildingWays);
       final List<Envelope> rivers = _parseRivers(allPoints, riverWays);
-      final List<Polygon> seaAndLakes =
-          _parseSeaAndLakes(allPoints, seaAndLakesWays);
+      final List<Land> lands = _parseLands(allPoints, landsWays);
 
       viewport.offset = scale(calculateCentroid(allPoints), -1);
       viewport.zoom = VirtualWorldSettings.viewportZoomMax;
 
-      return World(
+      World world = World(
         graph: Graph(points: points, segments: segments),
         viewport: viewport,
         regenerateBuildings: false,
-      )
-        ..buildings = buildings
-        ..rivers = rivers
-        ..seaAndLakes = seaAndLakes;
+        regenerateTrees: false,
+      );
+
+      world.buildings = buildings;
+      world.rivers = rivers;
+
+      // Generate trees in [LandType.forest] polygons
+      List<Tree> trees = List.empty(growable: true);
+      lands.where((l) => l.type == LandType.forest).forEach((l) {
+        trees.addAll(
+          world.generateTrees(
+            polygon: l.polygon,
+            allowInMiddleOfNowhere: true,
+            density: 1,
+          ),
+        );
+      });
+
+      return world
+        ..lands = lands
+        ..trees = trees;
     } catch (e, stackTrace) {
       print('Failed to parse OSM data. Check your input');
       print(e);
@@ -170,8 +187,8 @@ class OSM {
     return envelopes;
   }
 
-  static List<Polygon> _parseSeaAndLakes(List<Point> allPoints, List ways) {
-    List<Polygon> polygons = [];
+  static List<Land> _parseLands(List<Point> allPoints, List ways) {
+    List<Land> lands = [];
 
     for (var way in ways) {
       final ids = way['nodes'];
@@ -181,9 +198,67 @@ class OSM {
         points.add(p);
       }
 
-      polygons.add(Polygon(points));
+      LandType type = LandType.unknown;
+      String? typeKey;
+      if ((way['tags'] as Map<String, dynamic>).containsKey('natural')) {
+        typeKey = way['tags']['natural'];
+      } else if ((way['tags'] as Map<String, dynamic>).containsKey('landuse')) {
+        typeKey = way['tags']['landuse'];
+      }
+
+      type = switch (typeKey) {
+        'water' ||
+        'bay' ||
+        'spring' ||
+        'hot_spring' ||
+        'strait' ||
+        'wetland' ||
+        'basic' ||
+        'salt_pond' =>
+          LandType.water,
+        'meadow' ||
+        'grassland' ||
+        'hill' ||
+        'valley' ||
+        'grass' ||
+        'village_green' =>
+          LandType.green,
+        'farmland' || 'paddy' => LandType.farmland,
+        'orchard' || 'vineyard' => LandType.orchard,
+        'scrub' ||
+        'tundra' ||
+        'mud' ||
+        'cliff' ||
+        'dune' ||
+        'brownfield' ||
+        'landfill' =>
+          LandType.tundra,
+        'forest' || 'wood' || 'gully' => LandType.forest,
+        'beach' ||
+        'cape' ||
+        'coastline' ||
+        'isthmus' ||
+        'peninsula' ||
+        'shingle' ||
+        'shoal' ||
+        'sand' =>
+          LandType.beach,
+        'glacier' ||
+        'arete' ||
+        'peak' ||
+        'winter_sports' ||
+        'crevasse' =>
+          LandType.snow,
+        'rock' || 'sand' || 'saddle' || 'stone' || 'quarry' => LandType.rock,
+        'volcano' => LandType.volcano,
+        _ => LandType.unknown,
+      };
+
+      lands.add(
+        Land(Polygon(points), type: type),
+      );
     }
 
-    return polygons;
+    return lands;
   }
 }

@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:self_driving_car/virtual_world/settings.dart';
 
 import '../../utils/math.dart';
+import '../../virtual_world/street_furniture/land.dart';
 import '../../virtual_world/world.dart';
 import '../primitives/envelope.dart';
 import '../primitives/point.dart';
-import '../primitives/polygon.dart';
 import '../primitives/segment.dart';
 import 'circle_button.dart';
 
@@ -127,11 +127,10 @@ class MiniMapPainter extends CustomPainter {
     }
 
     // Sea and lakes
-    for (Polygon p in world.seaAndLakes) {
-      p.paint(
+    for (Land l in world.lands) {
+      l.paint(
         canvas,
         size,
-        fill: VirtualWorldSettings.riverColor,
         lineWidth: VirtualWorldSettings.riverMargin,
       );
     }

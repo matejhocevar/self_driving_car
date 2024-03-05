@@ -6,6 +6,7 @@ import '../common/constants/vehicles.dart';
 import '../common/controls.dart';
 import '../common/primitives/point.dart';
 import '../common/vehicle.dart';
+import 'street_furniture/land.dart';
 
 class VirtualWorldSettings {
   VirtualWorldSettings._();
@@ -49,9 +50,22 @@ class VirtualWorldSettings {
   static const int riverRoundness = 10;
   static const Color riverColor = Color(0xff4682B4);
 
-  // Sea and lakes
-  static const double seaAndLakesMargin = 15;
-  static const Color seaAndLakesColor = Color(0xff4682B4);
+  // Lands
+  static const double landsMargin = 15;
+
+  static landsColor(LandType type) => switch (type) {
+        LandType.water => const Color(0xff0077be),
+        LandType.green => const Color(0xff3cb371),
+        LandType.farmland => const Color(0xffeedc82),
+        LandType.forest => const Color(0xff96864f),
+        LandType.orchard => const Color(0xff8fbc8f),
+        LandType.tundra => const Color(0xffd2b48c),
+        LandType.beach => const Color(0xffeedd82),
+        LandType.snow => const Color(0xffffffff),
+        LandType.rock => const Color(0xffa9a9a9),
+        LandType.volcano => const Color(0xffb22222),
+        LandType.unknown || _ => const Color(0xff6dbb67),
+      };
 
   // Editors
   static const Color editorBlueprintColor = Color(0xff2168e8);

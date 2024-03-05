@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math' as math;
+import 'dart:ui';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,7 @@ import 'markings/start.dart';
 import 'markings/traffic_light.dart';
 import 'settings.dart';
 import 'street_furniture/building.dart';
+import 'street_furniture/land.dart';
 import 'street_furniture/street_furniture.dart';
 import 'street_furniture/tree.dart';
 import 'viewport.dart';
@@ -33,6 +35,7 @@ class World extends CustomPainter {
     double? treeSize,
     int? treeTryCount,
     this.regenerateBuildings = true,
+    this.regenerateTrees = true,
     this.graphHash,
   }) {
     this.roadWidth = roadWidth ?? VirtualWorldSettings.roadWidth;
@@ -52,6 +55,7 @@ class World extends CustomPainter {
   late final int roadRoundness;
 
   bool regenerateBuildings;
+  bool regenerateTrees;
   late final double buildingWidth;
   late final double buildingMinLength;
   late final double spacing;
@@ -66,7 +70,7 @@ class World extends CustomPainter {
   List<Building> buildings = List.empty(growable: true);
   List<Tree> trees = List.empty(growable: true);
   List<Envelope> rivers = List.empty(growable: true);
-  List<Polygon> seaAndLakes = List.empty(growable: true);
+  List<Land> lands = List.empty(growable: true);
 
   List<Car> cars = [];
   Car? bestCar;
@@ -78,7 +82,7 @@ class World extends CustomPainter {
     buildings.length = 0;
     trees.length = 0;
     rivers.length = 0;
-    seaAndLakes.length = 0;
+    lands.length = 0;
   }
 
   void generate() {
@@ -96,8 +100,10 @@ class World extends CustomPainter {
       buildings = _generateBuildings();
     }
 
-    print('Generating trees...');
-    trees = _generateTrees();
+    if (regenerateTrees) {
+      print('Generating trees...');
+      trees = generateTrees();
+    }
 
     print('Generating guide lanes...');
     laneGuides.length = 0;
@@ -180,13 +186,25 @@ class World extends CustomPainter {
         .toList();
   }
 
-  List<Tree> _generateTrees() {
+  List<Tree> generateTrees({
+    Polygon? polygon,
+    bool allowInMiddleOfNowhere = false,
+    double density = 0,
+  }) {
     List<Tree> trees = [];
+    List<Point> points = [];
 
-    final points = [
-      ...roadBorders.map((s) => [s.p1, s.p2]).expand((e) => e).toList(),
-      ...buildings.map((b) => b.base.points).expand((e) => e).toList(),
-    ];
+    // Clamp [density] to interval between 0 and 0.5
+    density = clampDouble(density, 0, 0.5);
+
+    if (polygon == null) {
+      points = [
+        ...roadBorders.map((s) => [s.p1, s.p2]).expand((e) => e).toList(),
+        ...buildings.map((b) => b.base.points).expand((e) => e).toList(),
+      ];
+    } else {
+      points = polygon.points;
+    }
 
     if (points.isNotEmpty) {
       final left = points.map((p) => p.x).reduce(math.min);
@@ -194,9 +212,19 @@ class World extends CustomPainter {
       final top = points.map((p) => p.y).reduce(math.min);
       final bottom = points.map((p) => p.y).reduce(math.max);
 
+      // Re-add all envelopes, important for osm parse
+      // otherwise, envelopes are not generated yet
+      List<Envelope> tmpEnvelopes = [];
+      for (Segment s in graph.segments) {
+        tmpEnvelopes.add(
+          Envelope(s, width: roadWidth, roundness: roadRoundness),
+        );
+      }
+
       List<Polygon> illegalPolygons = [
         ...buildings.map((b) => b.base),
-        ...envelopes.map((e) => e.polygon),
+        ...rivers.map((b) => b.polygon),
+        ...tmpEnvelopes.map((e) => e.polygon),
       ];
 
       int tryCount = 0;
@@ -206,20 +234,34 @@ class World extends CustomPainter {
           lerp(bottom, top, math.Random().nextDouble()),
         );
 
-        // Check for tree inside or nearby buildings / road
         bool keep = true;
-        for (Polygon polygon in illegalPolygons) {
-          if (polygon.containsPoint(p) ||
-              polygon.distanceToPoint(p) < treeSize / 2) {
-            keep = false;
-            break;
+
+        // Check if tree is inside the polygon
+        if (polygon != null && !polygon.containsPoint(p)) {
+          keep = false;
+        }
+
+        // Check for tree inside or nearby buildings / road
+        if (keep) {
+          for (Polygon polygon in illegalPolygons) {
+            if (polygon.containsPoint(p) ||
+                polygon.distanceToPoint(p) < treeSize / 2) {
+              keep = false;
+              break;
+            }
           }
         }
 
         // Check if it overlap existing trees
+        // considering [density] parameter
         if (keep) {
           for (var tree in trees) {
-            if (distance(tree.center, p) < treeSize) {
+            double adjustedTreeSize = lerp(
+              treeSize,
+              0,
+              density,
+            );
+            if (distance(tree.center, p) < adjustedTreeSize) {
               keep = false;
               break;
             }
@@ -227,15 +269,17 @@ class World extends CustomPainter {
         }
 
         // Avoiding trees in the middle of nowhere
-        if (keep) {
-          bool closeToSomething = false;
-          for (Polygon polygon in illegalPolygons) {
-            if (polygon.distanceToPoint(p) < treeSize * 2) {
-              closeToSomething = true;
-              break;
+        if (!allowInMiddleOfNowhere) {
+          if (keep) {
+            bool closeToSomething = false;
+            for (Polygon polygon in illegalPolygons) {
+              if (polygon.distanceToPoint(p) < treeSize * 2) {
+                closeToSomething = true;
+                break;
+              }
             }
+            keep = closeToSomething;
           }
-          keep = closeToSomething;
         }
 
         if (keep) {
@@ -371,13 +415,12 @@ class World extends CustomPainter {
       );
     }
 
-    // Sea and lakes
-    for (Polygon p in seaAndLakes) {
-      p.paint(
+    // Lands
+    for (Land l in lands) {
+      l.paint(
         canvas,
         size,
-        fill: VirtualWorldSettings.seaAndLakesColor,
-        lineWidth: VirtualWorldSettings.seaAndLakesMargin,
+        lineWidth: VirtualWorldSettings.landsMargin,
       );
     }
 
