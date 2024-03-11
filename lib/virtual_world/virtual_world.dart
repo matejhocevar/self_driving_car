@@ -181,6 +181,12 @@ class _VirtualWorldState extends State<VirtualWorld>
       cars
           .where((Car c) => (c.fitness - maxFitness).abs() > 500)
           .forEach((Car c) => c.damaged = true);
+
+      // Try regenerate corridor and update road borders
+      if (world.tryRegenerateCorridor()) {
+        roadBorders =
+            world.corridor!.map((s) => [s.p1.offset, s.p2.offset]).toList();
+      }
     });
   }
 

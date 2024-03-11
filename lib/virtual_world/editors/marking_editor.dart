@@ -72,6 +72,7 @@ class _MarkingEditorState extends State<MarkingEditor> {
       final (projPoint, offset) = segment.projectPoint(mouse!);
       if (offset >= 0 && offset <= 1) {
         intent = widget.createMarking(projPoint, segment);
+        widget.world.tryRegenerateCorridor();
       } else {
         intent = null;
       }

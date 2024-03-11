@@ -1,14 +1,10 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 import '../../common/canvas/blueprint.dart';
 import '../../common/primitives/point.dart';
 import '../../common/primitives/segment.dart';
-import '../../shortest_path/dijkstra_algorithm.dart';
 import '../../utils/math.dart';
 import '../graph.dart';
-import '../markings/start.dart';
-import '../markings/target.dart';
 import '../settings.dart';
 import '../viewport.dart';
 import '../world.dart';
@@ -195,28 +191,6 @@ class GraphEditorPainter extends CustomPainter {
     }
 
     hovered?.paint(canvas, size, fill: true);
-
-    Point? startPoint =
-        world.markings.whereType<Start>().firstOrNull?.polygon.points.first;
-    Point? endPoint =
-        world.markings.whereType<Target>().firstOrNull?.polygon.points.first;
-
-    if (startPoint == null && endPoint == null) {
-      List<Point> path = world.graph.findShortestPath(
-        DijkstraAlgorithm(),
-        startPoint!,
-        endPoint!,
-      );
-
-      for (Point point in path) {
-        point.paint(
-          canvas,
-          size,
-          color: Colors.orange,
-          radius: 24,
-        );
-      }
-    }
 
     canvas.restore();
   }

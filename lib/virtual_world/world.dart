@@ -11,10 +11,12 @@ import '../common/primitives/point.dart';
 import '../common/primitives/polygon.dart';
 import '../common/primitives/segment.dart';
 import '../common/traffic_light_system.dart';
+import '../shortest_path/dijkstra_algorithm.dart';
 import '../utils/math.dart';
 import 'graph.dart';
 import 'markings/marking.dart';
 import 'markings/start.dart';
+import 'markings/target.dart';
 import 'markings/traffic_light.dart';
 import 'settings.dart';
 import 'street_furniture/building.dart';
@@ -66,6 +68,7 @@ class World extends CustomPainter {
   List<Segment> roadBorders = List.empty(growable: true);
   List<Segment> laneGuides = List.empty(growable: true);
   List<Marking> markings = List.empty(growable: true);
+  List<Segment>? corridor = List.empty(growable: true);
 
   List<Building> buildings = List.empty(growable: true);
   List<Tree> trees = List.empty(growable: true);
@@ -301,6 +304,67 @@ class World extends CustomPainter {
     return trees;
   }
 
+  bool tryRegenerateCorridor() {
+    Start? start = markings.firstWhereOrNull((m) => m is Start) as Start?;
+    Target? target = markings.firstWhereOrNull((m) => m is Target) as Target?;
+
+    // Reset the corridor
+    corridor = null;
+
+    if (start != null && target != null) {
+      corridor = generateCorridor(start.center, target.center);
+      return true;
+    }
+
+    return false;
+  }
+
+  List<Segment> generateCorridor(Point start, Point end) {
+    final startSeg = getNearestSegment(start, graph.segments);
+    final endSeg = getNearestSegment(end, graph.segments);
+
+    final (projStart, _) = startSeg!.projectPoint(start);
+    final (projEnd, _) = endSeg!.projectPoint(end);
+
+    // Add temp graph points
+    graph.points.add(projStart);
+    graph.points.add(projEnd);
+
+    List<Segment> tmpSegments = [
+      Segment(startSeg.p1, projStart),
+      Segment(projStart, startSeg.p2),
+      Segment(endSeg.p1, projEnd),
+      Segment(projEnd, endSeg.p2),
+    ];
+    if (startSeg == endSeg) {
+      tmpSegments.add(Segment(projStart, projEnd));
+    }
+
+    // Add temp graph segments
+    graph.segments.addAll(tmpSegments);
+
+    List<Point> path = graph.findShortestPath(
+      DijkstraAlgorithm(),
+      projStart,
+      projEnd,
+    );
+
+    // Remove temp graph points and segments
+    graph.removePoint(projStart);
+    graph.removePoint(projEnd);
+
+    List<Segment> segments = [];
+    for (int i = 1; i < path.length; i++) {
+      segments.add(Segment(path[i - 1], path[i]));
+    }
+
+    final tmpEnvelopes = segments.map(
+      (s) => Envelope(s, width: roadWidth, roundness: roadRoundness),
+    );
+
+    return Polygon.union(tmpEnvelopes.map((e) => e.polygon).toList());
+  }
+
   List<Segment> _generateLaneGuides() {
     List<Envelope> tmpEnvelopes = [];
     for (Segment s in graph.segments) {
@@ -459,6 +523,12 @@ class World extends CustomPainter {
         color: Colors.white,
         width: VirtualWorldSettings.roadBorderWidth,
       );
+    }
+
+    if (corridor != null) {
+      for (Segment seg in corridor!) {
+        seg.paint(canvas, size, color: Colors.red, width: 4);
+      }
     }
 
     for (int i = 0; i < traffic.length; i++) {
