@@ -1,8 +1,8 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:self_driving_car/utils/canvas.dart';
 
+import '../../utils/canvas.dart';
 import '../../utils/math.dart';
 import 'point.dart';
 

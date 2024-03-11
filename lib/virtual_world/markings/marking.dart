@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:self_driving_car/common/constants/vehicles.dart';
 
+import '../../common/constants/vehicles.dart';
 import '../../common/primitives/envelope.dart';
 import '../../common/primitives/point.dart';
 import '../../common/primitives/polygon.dart';

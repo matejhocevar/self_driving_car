@@ -1,10 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:self_driving_car/utils/color.dart';
 
 import '../../common/primitives/point.dart';
 import '../../common/primitives/polygon.dart';
+import '../../utils/color.dart';
 import '../../utils/math.dart';
 import 'street_furniture.dart';
 

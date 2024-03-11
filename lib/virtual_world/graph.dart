@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../common/primitives/point.dart';
 import '../common/primitives/segment.dart';
+import '../shortest_path/shortest_path_algorithm.dart';
 
 class Graph extends CustomPainter {
   Graph({
@@ -42,6 +43,14 @@ class Graph extends CustomPainter {
 
   void removeSegment(Segment segment) {
     segments.removeWhere((s) => s == segment);
+  }
+
+  List<Point> findShortestPath(
+    ShortestPathAlgorithm algorithm,
+    Point start,
+    Point end,
+  ) {
+    return algorithm.findShortestPath(this, start, end);
   }
 
   void dispose() {

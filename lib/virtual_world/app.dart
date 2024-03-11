@@ -6,7 +6,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:self_driving_car/virtual_world/virtual_world.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../common/components/minimap.dart';
@@ -25,6 +24,7 @@ import 'editors/yield_editor.dart';
 import 'graph.dart';
 import 'osm.dart';
 import 'settings.dart';
+import 'virtual_world.dart';
 import 'world.dart';
 
 enum WorldMode {

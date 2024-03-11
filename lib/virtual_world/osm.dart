@@ -1,14 +1,12 @@
 import 'dart:convert';
 import 'dart:math' as math;
-
-import 'package:self_driving_car/common/primitives/envelope.dart';
-import 'package:self_driving_car/virtual_world/settings.dart';
-
+import '../common/primitives/envelope.dart';
 import '../common/primitives/point.dart';
 import '../common/primitives/polygon.dart';
 import '../common/primitives/segment.dart';
 import '../utils/math.dart';
 import 'graph.dart';
+import 'settings.dart';
 import 'street_furniture/building.dart';
 import 'street_furniture/land.dart';
 import 'street_furniture/tree.dart';
