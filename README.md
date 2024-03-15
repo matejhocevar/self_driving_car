@@ -49,7 +49,11 @@ In build editor you are enable you to edit:
 - 🏎️ Start marking position
 - 🏁 Target marking position
 
-![Video](/media/build_editor.mp4)
+<table>
+<tr>
+  <td align="center"><img src="/media/build_editor.gif" alt="Build editor"></td>
+</tr>
+</table>
 
 ### Import from Open Street map
 
@@ -62,7 +66,11 @@ Parser will extract the following data:
 * 🦦 Rivers
 * 🌾 All land field types
 
-![Video](/media/real_world.mp4)
+<table>
+<tr>
+  <td align="center"><img src="/media/real_world.gif" alt="Real world example"></td>
+</tr>
+</table>
 
 #### Fetching the data
 
