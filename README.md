@@ -1,14 +1,17 @@
 <div align="center">
-  <img src="/media/logo.png" alt="Self-Driving Car project" width="300">
+  <img src="/media/logo.png" alt="Self-Driving Car project" height="455" width="250">
   <div style="padding-top: 10px;">
     <h1 style="margin: 0;">Self-Driving Car</h1>
-    <p style="margin: 0;">Canvas painted project written in Flutter/Dart without 3rd-party libraries</p>
+    <p style="margin: 0;">Canvas painted project written in Flutter/Dart without 3rd-party libraries.</p>
   </div>
 </div>
 
 ## Preview
 
 Project contains two game modes:
+
+* Infinity road with endless traffic spawn
+* Virtual world with editor builder
 
 <table>
 <tr>
@@ -48,7 +51,7 @@ In build editor you are enable you to edit:
 
 <table>
 <tr>
-  <td align="center"><img src="/media/builder_editor.mov" alt="Virtual world" height="480"></td>
+  <td align="center"><img src="/media/build_editor.mp4" alt="Build editor" width="688"></td>
 </tr>
 </table>
 
@@ -65,7 +68,7 @@ Parser will extract the following data:
 
 <table>
 <tr>
-  <td align="center"><img src="/media/real_world.mov" alt="Virtual world" height="480"></td>
+  <td align="center"><img src="/media/real_world.mp4" alt="Real world example" width="688"></td>
 </tr>
 </table>
 
@@ -126,14 +129,14 @@ out skel;	// Remove some extra details
 * 📱 Mobile (iOS, Android)
 * 🔗 Web
 
-## Special thanks
+## Special Thank You
 
 Special thanks to [Radu Mariescu-Istodor](https://github.com/gniziemazity) for:
 
-* amazing course
+* 🤩 amazing course
   on [Self-driving car - No libraries - JavaScript course](https://www.youtube.com/watch?v=NkI9ia2cLhc&list=PLB0Tybl0UNfYoJE7ZwsBQoDIG4YN9ptyY),
-* great way of explaining custom neural networks,
-* super content that he provides and
-* source of inspiration.
+* 💫 great way of explaining custom neural networks,
+* 🎸 super content that he provides and
+* 🚀 source of inspiration.
 
-Thank you!
+Thank you! 🙏
