@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="/media/logo.png" alt="Self-Driving Car project" height="455" width="250">
+  <img src="/media/logo.png" alt="Self-Driving Car project" width="250">
   <div style="padding-top: 10px;">
     <h1 style="margin: 0;">Self-Driving Car</h1>
     <p style="margin: 0;">Canvas painted project written in Flutter/Dart without 3rd-party libraries.</p>
@@ -49,11 +49,7 @@ In build editor you are enable you to edit:
 - 🏎️ Start marking position
 - 🏁 Target marking position
 
-<table>
-<tr>
-  <td align="center"><img src="/media/build_editor.mp4" alt="Build editor" width="688"></td>
-</tr>
-</table>
+![Video](/media/build_editor.mp4)
 
 ### Import from Open Street map
 
@@ -66,11 +62,7 @@ Parser will extract the following data:
 * 🦦 Rivers
 * 🌾 All land field types
 
-<table>
-<tr>
-  <td align="center"><img src="/media/real_world.mp4" alt="Real world example" width="688"></td>
-</tr>
-</table>
+![Video](/media/real_world.mp4)
 
 #### Fetching the data
 
